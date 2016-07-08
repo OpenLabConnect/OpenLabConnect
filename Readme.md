@@ -31,5 +31,5 @@ The open source is to interface with analyzer machine in order to automatically 
 *  Project leaders: Ninh Pham, Ha Le
 *  Project contributors: Reshma Kakkar, Jan Flowers
 *  Project members:
-    * Dev: Ninh Pham, Ha Le, Tin Pham, Hung Bui
+    * Dev: Trung Tran, Tin Pham, Ninh Pham, Hung Bui, Ha Le
     * QC: Hoa Tran
