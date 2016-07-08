@@ -1,0 +1,13 @@
+{
+  "api": {
+    "username": "root@openhim.org",
+    "password": "gcsvn123",
+    "apiURL": "https://localhost:8080",
+    "router": {
+      "username": "root@openhim.org",
+      "password": "gcsvn123",
+      "apiURL": "https://localhost:5000"
+    },
+    "addResultELIS": "http://localhost:8080/openELIS_vi/services/etor/addAIMTestResult/"
+  }
+}

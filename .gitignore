@@ -1,0 +1,8 @@
+node_modules/
+client/bower_components/
+client/styles/css
+.idea/
+dist/
+css
+.sass-cache/
+npm-debug.log

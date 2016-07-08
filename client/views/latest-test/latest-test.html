@@ -1,0 +1,56 @@
+<div class="row">
+  <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+      <h2 class="page-title text-primary">{{ 'TITLE_GET_LATEST_TESTS' | translate }}</h2>
+  </div>
+</div>
+<div class="row">
+  <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+    <form action="" method="POST" class="form-horizontal" role="form">
+      <div class="form-group">
+        <div class="control-label col-xs-1">&nbsp;</div>
+        <div class="col-xs-12">
+          <button type="button" class="btn btn-primary" ng-click="vm.onGetLatest()"> {{ 'latestTest.GET_LATEST' | translate }}</button>
+        </div>
+      </div>
+    </form>
+  </div>
+</div>
+<div class="row">
+  <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+    <table class="table table-striped table-hover table-bordered">
+      <thead>
+        <tr>
+          <th>{{ 'latestTest.TEST_ID' | translate }}</th>
+          <th>{{ 'latestTest.TEST_NAME' | translate }}</th>
+          <th>{{ 'latestTest.DESCRIPTION' | translate }}</th>
+          <th>{{ 'latestTest.SECTION' | translate }}</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr ng-repeat="test in vm.tests">
+          <td width="15%">{{ test.testId }}</td>
+          <td width="25%">{{ test.name }}</td>
+          <td width="35%">{{ test.description }}</td>
+          <td width="25%">{{ test.section }}</td>
+        </tr>
+      </tbody>
+    </table>
+    <div align="right">
+      <uib-pagination total-items="vm.totalItems" ng-model="vm.currentPage" items-per-page= {{vm.recordPerPage}} max-size="10" class="pagination-sm" boundary-link-numbers="true" ng-change="vm.pageChanged()" next-text="{{ 'NEXT' | translate }}" previous-text="{{ 'PREVIOUS' | translate }}" ng-hide="(vm.recordPerPage >= vm.totalItems)">
+      </uib-pagination>
+  </div>
+  </div>
+</div>
+<script type="text/ng-template" id="alert-modal-get-latest-test">
+	<div class="modal-header">
+		<h3 class="modal-title text-danger">{{ 'GETLATESTTEST' | translate }}</h3>
+	</div>
+	<div class="modal-body">
+		<p>{{ popupMessage | translate }}</p>
+    <p>{{ numberCreated | translate:translationDataCreated }}</p>
+    <p>{{ numberUpdated | translate:translationDataUpdated }}</p>
+	</div>
+	<div class="modal-footer">
+		<button class="btn btn-default" type="button" ng-click="close()">{{ 'OK' | translate }}</button>
+	</div>
+</script>

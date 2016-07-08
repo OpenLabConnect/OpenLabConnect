@@ -1,0 +1,85 @@
+<div class="row">
+  <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+    <h2 class="page-title text-primary">{{ 'TITLE_LOGS' | translate }}</h2>
+  </div>
+</div>
+<div class="row">
+  <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+    <form action="" method="POST" class="form-horizontal" role="form">
+      <div class="form-group">
+        <div class="control-label control-label-right col-xs-1">{{ 'history.FROMDATE' | translate }}:</div>
+        <div class="col-xs-2">
+          <div class="input-group date" id="fromDateDtp">
+            <input type="text" readonly class="form-control" uib-datepicker-popup="dd/MM/yyyy" ng-model="vm.search.fromDate" ng-required="false" is-open="vm.dtpFrom.opened" ng-required="true" close-text="{{ 'CLOSE' | translate }}" clear-text="{{ 'CLEAR' | translate }}" current-text="{{ 'TODAY' | translate }}" alt-input-formats="dd/MM/yyyy" datepicker-options="vm.dateOptions" placeholder="dd/mm/yyyy" ng-focus="vm.dtpFromOpen()"/>
+            <span class="input-group-btn">
+              <button type="button" class="btn btn-default" ng-click="vm.dtpFromOpen()"><i class="glyphicon glyphicon-calendar"></i></button>
+            </span>
+          </div>
+        </div>
+        <div class="control-label control-label-right col-xs-1">{{ 'history.TODATE' | translate }}:</div>
+        <div class="col-xs-2">
+          <div class="input-group date" id="toDateDtp">
+            <input type="text" readonly class="form-control" uib-datepicker-popup="dd/MM/yyyy" ng-model="vm.search.toDate" ng-required="false" is-open="vm.dtpTo.opened" ng-required="true" close-text="{{ 'CLOSE' | translate }}" clear-text="{{ 'CLEAR' | translate }}" current-text="{{ 'TODAY' | translate }}" alt-input-formats="dd/MM/yyyy" datepicker-options="vm.dateOptions" placeholder="dd/mm/yyyy" ng-focus="vm.dtpToOpen()"/>
+            <span class="input-group-btn">
+              <button type="button" class="btn btn-default" ng-click="vm.dtpToOpen()"><i class="glyphicon glyphicon-calendar"></i></button>
+            </span>
+          </div>
+        </div>
+        <div class="control-label control-label-right col-xs-2">{{ 'history.ANALYZER' | translate }}:</div>
+        <div class="col-xs-3">
+          <select class="form-control selectpicker analyzer" ng-model="vm.search.analyzer" ng-options="analyzer.name for analyzer in vm.analyzers">
+            <option></option>
+          </select>
+        </div>
+      </div>
+      <div class="form-group">
+        <div class="col-xs-2">
+          <button type="button" class="btn btn-primary" ng-click="vm.onSearch()">{{ 'SEARCH' | translate }}
+          &thinsp;
+          <span class="glyphicon glyphicon-search"></span>
+          </button>
+        </div>
+      </div>
+    </form>
+  </div>
+</div>
+<div class="row">
+  <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+    <table class="table table-striped table-hover table-bordered">
+      <thead>
+        <tr>
+          <th>{{ 'history.DATETIME' | translate }}</th>
+          <th>{{ 'history.ACTION' | translate }}</th>
+          <th>{{ 'history.DATA' | translate }}</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td colspan="3" ng-show="vm.noData"><span>{{ 'EMPTY_DATA' | translate }}</span></td>
+        </tr>
+        <tr ng-repeat = "history in vm.histories | orderBy: '-timestamp'">
+          <td width="15%">{{ history.timestamp | date:'HH:mm dd/MM/yyyy' }}</td>
+          <td width="35%"><span class="wordwrap">{{ history.action }}</span></td>
+          <td width="50%"><span class="wordwrap">{{ history.brief }}</span></td>
+        </tr>
+      </tbody>
+    </table>
+    <div align="right">
+      <uib-pagination total-items="vm.totalItems" ng-model="vm.currentPage" items-per-page= {{vm.recordPerPage}} max-size="10" class="pagination-sm" boundary-link-numbers="true" ng-change="vm.pageChanged()" next-text="{{ 'NEXT' | translate }}" previous-text="{{ 'PREVIOUS' | translate }}" ng-hide="(vm.recordPerPage >= vm.totalItems)">
+      </uib-pagination>
+    </div>
+  </div>
+</div>
+
+<script type="text/ng-template" id="alert-error-modal">
+  <div class="modal-header">
+    <h3 class="modal-title text-danger">{{ 'ERROR' | translate }}</h3>
+  </div>
+  <div class="modal-body">
+    <p>{{ errorMessage | translate }}</p>
+  </div>
+  <div class="modal-footer">
+    <button class="btn btn-default" type="button" ng-click="close()">{{ 'OK' | translate }}</button>
+  </div>
+</script>
+

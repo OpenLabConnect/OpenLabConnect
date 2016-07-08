@@ -1,0 +1,48 @@
+<div class="row">
+  <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+    <h2 class="page-title text-primary">{{ 'TITLE_STATUS_COM_PORTS' | translate }}</h2>
+  </div>
+</div>
+<div class="row">
+  <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+    <table class="table table-striped table-hover table-bordered">
+      <thead>
+        <tr>
+          <th width="50" class="text-center"><input type="checkbox" ng-model="vm.selectAll" ng-click="vm.checkAll()"/></th>
+          <th>{{ 'analyzer.NAME' | translate }}</th>
+          <th>{{ 'analyzer.PARAMETERS' | translate }}</th>
+          <th>{{ 'analyzer.PORT' | translate }}</th>
+          <th width="100">{{ 'analyzer.STATUS' | translate }}</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr ng-repeat = "analyzer in vm.analyzers">
+          <td class="text-center"><input type="checkbox" ng-model="analyzer.selected"/></td>
+          <td>{{ analyzer.name }}</td>
+          <td>{{ analyzer.params }}</td>
+          <td>{{ analyzer.port }}</td>
+          <td class="text-center">
+            <span class="analyzer-status glyphicon glyphicon-{{vm.statusIcon(analyzer.actived)}}"
+             aria-hidden="true"></span>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+<div class="row">
+  <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+    <button type="button" class="btn btn-primary" ng-click='vm.updateAnalyzersStatus(false, true)'>
+      {{ 'analyzer.action.OPEN' | translate }}
+    </button>
+    <button type="button" class="btn btn-primary" ng-click='vm.updateAnalyzersStatus(true, true)'>
+      {{ 'analyzer.action.OPEN_ALL' | translate }}
+    </button>
+    <button type="button" class="btn btn-default" ng-click='vm.updateAnalyzersStatus(false, false)'>
+     {{ 'analyzer.action.CLOSE' | translate }}
+    </button>
+    <button type="button" class="btn btn-default" ng-click='vm.updateAnalyzersStatus(true, false)'>
+      {{ 'analyzer.action.CLOSE_ALL' | translate }}
+    </button>
+  </div>
+</div>

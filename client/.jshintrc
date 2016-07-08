@@ -1,0 +1,19 @@
+{
+  "browser": true,
+  "globals": {
+    "angular": false,
+    "browser": false,
+    "element": false,
+    "by": false,
+    "module": false,
+    "console": false,
+    "it": false,
+    "describe": false,
+    "inject": false,
+    "expect": false,
+    "alert": false,
+    "afterEach": false,
+    "beforeEach": false,
+    "io" : false
+  }
+}

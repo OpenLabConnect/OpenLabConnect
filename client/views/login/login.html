@@ -1,0 +1,54 @@
+<!-- <div>
+  {{ vm.name }}
+</div>
+
+<form ng-submit="vm.login()">
+  <input type="email"
+         ng-model="vm.user.email"
+         placeholder="email">
+  <input type="password"
+         ng-model="vm.user.password"
+         placeholder="password">
+  <button type="submit">
+    login
+  </button>
+</form>
+
+<pre ng-if="vm.error">{{ vm.error | json }}</pre>
+ -->
+
+<div class="modal-login" id="modal-login">
+   <div class="modal-dialog">
+      <form ng-submit="vm.login()" method="post">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title">OpenAIM</h4>
+            </div>
+            <div class="modal-body">
+                <form action="" method="POST" class="form-horizontal" role="form">
+                    <div class="form-group">
+                        <div class="control-label-right login-label col-xs-4">{{ 'username' | translate }}:</div>
+                        <div class="col-xs-8">
+                            <input type="text" class="form-control" id="" placeholder="" ng-model="vm.user.email"/>
+                        </div>
+                    </div>
+                    </br>
+                    <div class="form-group">
+                        <div class="control-label-right login-label col-xs-4">{{ 'password' | translate}}:</div>
+                        <div class="col-xs-8">
+                            <input type="password" class="form-control" id="" placeholder="" ng-model="vm.user.password" />
+                        </div>
+                    </div>
+                    <br/>
+                    <div class="login-error">
+                    <span style="color:red;"> {{ vm.failed | translate }}</span>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="submit" class="btn btn-primary login-button" data-dismiss="modal">{{ 'login' | translate}}</button>
+            </div>
+        </div>
+      </form>
+   </div>
+</div>

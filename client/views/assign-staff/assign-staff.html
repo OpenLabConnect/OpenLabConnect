@@ -1,0 +1,49 @@
+<div class="row">
+  <div class="col-xs-10">
+    <div class="row">
+      <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+        <h2 class="page-title text-primary">{{ 'TITLE_ASSIGN_STAFF' | translate }}</h2>
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+        <table class="table table-striped table-hover table-bordered">
+          <thead>
+            <tr>
+              <th class="col-md-1">{{ 'assign.NO' | translate }}</th>
+              <th class="col-md-3">{{ 'assign.ANALYZER' | translate }}</th>
+              <th class="col-md-3">{{ 'assign.STAFF' | translate }}</th>
+              <th class="text-center col-md-2">{{ 'assign.ACTION' | translate }}</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr ng-repeat = "analyzer in vm.analyzers">
+              <td>{{ $index + 1 }}</td>
+              <td>{{ analyzer.name }}</td>
+              <td>
+                <span editable-text="analyzer.performedBy" e-name="name" e-form="rowform" e-required e-class="form-control">
+                  {{ analyzer.performedBy }}
+                </span>
+              </td>
+              <td class="text-center">
+                  <form editable-form name="rowform" ng-show="rowform.$visible" class="form-buttons form-inline" onaftersave="vm.onAssignStaffSave(analyzer)">
+                    <button type="submit" ng-disabled="rowform.$waiting" class="btn btn-primary">
+                      {{ 'SAVE' | translate }}
+                    </button>
+                    <button type="button" ng-disabled="rowform.$waiting" ng-click="rowform.$cancel()" class="btn btn-default">
+                      {{ 'CANCEL' | translate }}
+                    </button>
+                  </form>
+                  <div class="buttons" ng-show="!rowform.$visible">
+                    <button class="btn btn-default" type="button" ng-click="rowform.$show()">
+                      {{ 'EDIT' | translate }}
+                    </button>
+                  </div>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>

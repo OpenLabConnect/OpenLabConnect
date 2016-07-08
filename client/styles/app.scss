@@ -1,0 +1,100 @@
+body {
+  font-family: sans-serif;
+}
+
+
+body {
+    padding-top: 20px;
+}
+
+.wrapper {
+    min-width: 1200px;
+}
+
+.modal-dialog {
+  width: 400px;
+}
+
+.modal-login {
+    background: url(../images/bg.jpg) center center no-repeat;
+    background-size: cover;
+}
+
+.page-title {
+    margin-top: 0;
+    margin-bottom: 30px;
+}
+
+.modal-login .modal-content {
+    background: rgba(255, 255, 255, 0.5);
+    border-radius: 0;
+}
+
+.modal-login .modal-content input {
+    border: none;
+}
+
+.text-head {
+    color: #5bc0de;
+}
+
+.modal-login {
+    position: fixed;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    z-index: 1050;
+    overflow: hidden;
+    -webkit-overflow-scrolling: touch;
+    outline: 0;
+}
+.wordwrap {
+/* wrap long text and urls */
+white-space: pre; /* CSS 2.0 */
+white-space: pre-wrap; /* CSS 2.1 */
+white-space: pre-line; /* CSS 3.0 */
+white-space: -pre-wrap; /* Opera 4-6 */
+white-space: -o-pre-wrap; /* Opera 7 */
+white-space: -moz-pre-wrap; /* Mozilla */
+word-wrap: break-word; /* IE 5+ */}
+.test-map-analyzer-testcode {
+  width: 120px;
+}
+.test-map-analyzer-testname {
+  width: 250px;
+}
+.test-map-analyzer-order {
+  width: 60px;
+}
+.control-label-right {
+  text-align: right !important;
+}
+input.ui-select-search{
+  width: 250px !important;
+}
+.analyzer-status {
+  font-size: 20px;
+}
+.form-edit-accessionnumber {
+  display: table;
+  margin: auto;
+  margin-top: 5px; }
+
+.table-test-map td {
+vertical-align: middle !important;
+}
+.login-error {
+  padding: 5px;
+  text-align: center;
+  height: 30px;
+}
+.login-label {
+  padding: 5px;
+}
+.login-button {
+  margin-right: 15px;
+}
+.left-menu {
+  position: fixed;
+}

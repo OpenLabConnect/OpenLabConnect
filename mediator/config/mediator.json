@@ -1,0 +1,40 @@
+{
+  "urn": "urn:uuid:7f515910-de91-11e5-befd-576f5595ce40",
+  "version": "0.1.0",
+  "name": "LIS Mediator",
+  "description": "Brief Description",
+  "defaultChannelConfig": [
+    {
+      "name": "ELIS Mediator",
+      "urlPattern": "/elis-test-results",
+      "alerts": [],
+      "txRerunAcl": [],
+      "txViewFullAcl": [],
+      "txViewAcl": [],
+      "properties": [],
+      "matchContentTypes": [],
+      "routes": [
+        {
+          "name": "ELIS Mediator Route",
+          "host": "localhost",
+          "path": "/api/test",
+          "port": "2410",
+          "primary": true,
+          "type": "http"
+        }
+      ],
+      "allow": ["admin"],
+      "type": "http"
+    }
+  ],
+  "endpoints": [
+    {
+      "name": "ELIS Mediator Route",
+      "host": "localhost",
+      "path": "/api/test",
+      "port": "2410",
+      "primary": true,
+      "type": "http"
+    }
+  ]
+}
