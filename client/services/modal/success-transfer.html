@@ -1,0 +1,13 @@
+<div class="modal-header">
+  <h3 class="modal-title text-danger">{{ 'INFO' | translate }}</h3>
+</div>
+<div class="modal-body">
+  <p>{{ info | translate:translationData }}</p>
+  <p>{{ total | translate:translationData }}</p>
+  <p>{{ success | translate:translationData }}</p>
+  <p>{{ fail | translate:translationData }}</p>
+</div>
+<div class="modal-footer">
+  <button class="btn btn-default" type="button" ng-click="close()">{{ 'OK' | translate }}</button>
+  <a class="btn btn-default" type="button" ng-click="close()" ui-sref="history({latest: true})">{{ 'DETAIL' | translate }}</a>
+</div>

@@ -45,7 +45,7 @@ let column = Config.CONST().column;
       testName2Cell = this.templateConfig.testName2Cell,
       workSheet = this.workSheet,
       me = this;
-    if (!this._getTestCode()) { return Promise.resolve(Config.CONST().errorMessage.testCodeDoesNotExists.code) }
+    if (!this._getTestCode()) { return Promise.resolve(Config.CONST().errorMessage.testCodeDoesNotExists.code); }
     return AnalyzerTestMap.find({ testCode: this._getTestCode() })
     .populate('analyzer')
     .populate('test')
@@ -61,10 +61,10 @@ let column = Config.CONST().column;
       testName1 = workSheet[column[testName1Cell.c] + testName1Cell.r].w;
       testName2 = workSheet[column[testName2Cell.c] + testName2Cell.r].w;
       for (let i = 0; i < me.templateConfig.tests.length; i++) {
-        if (testName1.trim() == me.templateConfig.tests[i].name) {
+        if (testName1.trim() === me.templateConfig.tests[i].name) {
           testId1 = me.templateConfig.tests[i].id;
         }
-        if (testName2.trim() == me.templateConfig.tests[i].name) {
+        if (testName2.trim() === me.templateConfig.tests[i].name) {
           testId2 = me.templateConfig.tests[i].id;
         }
       }
@@ -88,7 +88,7 @@ let column = Config.CONST().column;
         return testMaps;
       });
     });
-  }
+  };
   // Override
   this.getTestResults = function () {
     if (!this._checkWorkSheet()) { return false; }
@@ -127,5 +127,5 @@ let column = Config.CONST().column;
     testResults.push(testResult);
   }
   return testResults;
-  }
+  };
  };

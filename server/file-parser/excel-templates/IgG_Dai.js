@@ -47,5 +47,5 @@ let Column = Config.CONST().column;
       testResults.push(testResult);
     }
     return testResults;
-  }
+  };
  };

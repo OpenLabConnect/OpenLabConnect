@@ -26,7 +26,7 @@ var storage = multer.diskStorage({
   }
 });
 
-var uploadMulter = multer({ storage: storage }).single('excel');
+var uploadMulter = multer({ storage: storage }).single('file');
 
 module.exports = {
   mongo: {

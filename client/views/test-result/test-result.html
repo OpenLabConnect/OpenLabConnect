@@ -38,7 +38,7 @@
       <div class="form-group">
         <div class="control-label col-xs-1">&nbsp;</div>
         <div class="col-xs-11">
-          <button type="submit" class="btn btn-primary">{{ 'SEARCH' | translate }}
+          <button type="submit" ng-disabled="vm.loading" class="btn btn-primary">{{ 'SEARCH' | translate }}
           &thinsp;
           <span class="glyphicon glyphicon-search"></span>
           </button>
@@ -49,7 +49,7 @@
         <div class="col-xs-11">
           <div class="checkbox">
             <label>
-              <input type="checkbox" ng-model="vm.autoInsert" ng-change="vm.onAutoInsert()"/>
+              <input type="checkbox" ng-model="vm.autoInsert" ng-change="vm.onAutoInsertChange()"/>
               {{ 'test.AUTO_INSERT' | translate }}
             </label>
           </div>
@@ -93,7 +93,7 @@
                 </button>
               </div>
             </form>
-            <span style="float: right;" class="glyphicon glyphicon-edit" role="button" ng-click="editAccNumberFrm.$show()" ng-hide="editAccNumberFrm.$visible">
+            <span style="float: right;" class="glyphicon glyphicon-edit" role="button" ng-click="vm.editAccNumber(analyzerResult, editAccNumberFrm)" ng-hide="editAccNumberFrm.$visible">
             </span>
             <!-- End edit accession number form -->
           </td>
@@ -115,52 +115,11 @@
 
 <div class="row">
   <div class="col-xs-6">
-    <button type="button" class="btn btn-primary" ng-disabled="vm.selectAll" ng-click="vm.onSelectAll(true)">{{ 'test.action.SELECT_ALL' | translate }}</button>
-    <button type="button" class="btn btn-primary" ng-disabled="vm.disabledDeSelectAllBtn" ng-click="vm.onSelectAll(false)">{{ 'test.action.DESELECT_ALL' | translate }}</button>
+    <button type="button" class="btn btn-primary" ng-click="vm.onSelectAll(true)">{{ 'test.action.SELECT_ALL' | translate }}</button>
+    <button type="button" class="btn btn-primary" ng-click="vm.onSelectAll(false)">{{ 'test.action.DESELECT_ALL' | translate }}</button>
   </div>
   <div class="col-xs-6 text-right">
-    <button type="button" class="btn btn-primary" ng-click="vm.onResultEntry()">{{ 'test.action.RESULT_ENTRY' | translate }}</button>
+    <button type="button" class="btn btn-primary" ng-disabled="vm.loading" ng-click="vm.onResultEntry()">{{ 'test.action.RESULT_ENTRY' | translate }}</button>
     <button type="button" class="btn btn-default" ng-disabled="vm.disabledDelBtn" ng-click="vm.onDelete()">{{ 'DELETE' | translate }}</button>
   </div>
 </div>
-<script type="text/ng-template" id="confirmDeleteResults">
-  <div class="modal-header">
-    <h3 class="modal-title">{{ 'DELETE_CONFIRM' | translate }}</h3>
-  </div>
-  <div class="modal-body">
-    <p>{{ 'MSG_DELETE_CONFIRM' | translate }}</p>
-  </div>
-  <div class="modal-footer">
-    <button class="btn btn-danger" type="button" ng-click="ok()">
-      {{ 'OK' | translate }}
-    </button>
-    <button class="btn btn-default" type="button" ng-click="cancel()">
-      {{ 'CANCEL' | translate }}
-    </button>
-  </div>
-</script>
-<script type="text/ng-template" id="alert-error-modal">
-  <div class="modal-header">
-    <h3 class="modal-title text-danger">{{ 'ERROR' | translate }}</h3>
-  </div>
-  <div class="modal-body">
-    <p>{{ errorMessage | translate:translationData }}</p>
-  </div>
-  <div class="modal-footer">
-    <button class="btn btn-default" type="button" ng-click="close()">{{ 'OK' | translate }}</button>
-  </div>
-</script>
-<script type="text/ng-template" id="alert-success-modal">
-	<div class="modal-header">
-		<h3 class="modal-title text-danger">{{ 'INFO' | translate }}</h3>
-	</div>
-	<div class="modal-body">
-		<p>{{ info | translate:translationData }}</p>
-    <p>{{ total | translate:translationData }}</p>
-    <p>{{ success | translate:translationData }}</p>
-    <p>{{ fail | translate:translationData }}</p>
-	</div>
-	<div class="modal-footer">
-		<button class="btn btn-default" type="button" ng-click="close()">{{ 'OK' | translate }}</button>
-	</div>
-</script>

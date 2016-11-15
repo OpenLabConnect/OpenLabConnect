@@ -1,6 +1,7 @@
 'use strict';
 const AnalyzerTestMap = require('../../api/analyzer-test-map/analyzer-test-map.model');
 const Config = require('../config');
+const Analyzer = require('../../api/analyzer/analyzer.model');
 let Column = Config.CONST().column;
 
  module.exports = function template (workSheet) {
@@ -10,12 +11,12 @@ let Column = Config.CONST().column;
   this._checkWorkSheet = function () {
     if (!this.workSheet) { return false; }
     return true;
-  }
+  };
   this._getTestCode = function () {
     let rawTestCode = this.workSheet[Column[this.templateConfig.testCodeCell.c] + this.templateConfig.testCodeCell.r];
     if (!rawTestCode) {return false;}
     return (rawTestCode.w.slice(18)).trim();
-  }
+  };
   // Protected Function
   this._convertResult = function (result) {
     let resultConvert = Config.CONST().resultConvert;
@@ -25,12 +26,12 @@ let Column = Config.CONST().column;
         return resultConvert[i].result;
       }
     }
-  }
+  };
 
   this.getTestMaps = function () {
     let check = true;
-    if (!this._getTestCode()) { return Promise.resolve(Config.CONST().errorMessage.testCodeDoesNotExists.code) }
-    return AnalyzerTestMap.find({ testCode: this._getTestCode() })
+    if (!this._getTestCode()) { return Promise.resolve(Config.CONST().errorMessage.testCodeDoesNotExists.code); }
+    return AnalyzerTestMap.find({ testCode: this._getTestCode()})
     .populate('analyzer')
     .populate('test')
     .exec()
@@ -51,7 +52,7 @@ let Column = Config.CONST().column;
       }
       return testMaps;
     });
-  }
+  };
 
   this.getTestResults = function () {
     if (!this._checkWorkSheet()) { return false; }
@@ -81,5 +82,5 @@ let Column = Config.CONST().column;
       testResults.push(testResult);
     }
     return testResults;
-  }
+  };
  };

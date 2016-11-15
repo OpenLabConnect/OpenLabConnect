@@ -1,7 +1,7 @@
 'use strict';
 
 angular.module('openAim')
-  .controller('TestResultCtrl', function ($interval, $http, $uibModal, analyzerRes, analyzerResultsRes, Constant, $q) {
+  .controller('TestResultCtrl', function ($http, Api, Setting, ModalService, Constant, $q, $interval, $rootScope) {
 
     var vm = this;
 
@@ -13,6 +13,7 @@ angular.module('openAim')
       search: {
         analyzer: null,
         accessionNumber: '',
+        testType: '',
         beginDate: new Date(),
         status: ''
       },
@@ -20,8 +21,9 @@ angular.module('openAim')
       testResultStatus: [Constant.testResultStatus.NEW, Constant.testResultStatus.SAVED],
       selectAll: false,
       autoInsert: false,
+      autoInsertObj: {},
       disabledDelBtn: true,
-      disabledDeSelectAllBtn: true,
+      loading: false,
       countCheck: 0,
 
       // pagination config
@@ -53,7 +55,7 @@ angular.module('openAim')
         get all analyzers
       */
       getAnalyzers: function(){
-        return analyzerRes.query().$promise.then(function(data) {
+        return Api.Analyzer.query().$promise.then(function(data) {
           console.log(Constant.msg.analyzer.MSG_LOAD_DATA_SUCCESS + new Date());
           vm.analyzers = data;
           return data;
@@ -68,24 +70,27 @@ angular.module('openAim')
         @param: status (NEW/TRANSFERRED)
         by default: the status is NEW and the receivedDate is current date
       */
-      getAnalyzerResults: function(status){
+      getAnalyzerResults: function(status, flagAll){
+        vm.loading = true;
         var analyzerID = null;
         if(vm.search.analyzer) {
           analyzerID = vm.search.analyzer._id;
         }
         // send request with filter condition and get return data
-        return analyzerResultsRes.searchAnalyzers({
+        return Api.AnalyzerResult.get({
           page: vm.currentPage,
           analyzer: analyzerID,
           status: (status === '') ? null : status,
+          testType: (vm.search.testType === '') ? null : vm.search.testType,
           beginDate: (vm.timestamp === '') ? null : vm.timestamp,
           accessionNumber: (vm.search.accessionNumber === '') ? null : vm.search.accessionNumber,
-          limit: vm.recordPerPage
+          limit: flagAll ? 0 : vm.recordPerPage
         }).$promise.then(function(data) {
             console.log(Constant.msg.analyzerResult.MSG_LOAD_DATA_SUCCESS + new Date());
             vm.analyzerResults = data.analyzerResult;
             vm.totalItems = data.totalAnalyzerResult;
-            vm.noData = (data.totalAnalyzerResult === 0);
+            vm.disabledEntryBtn = vm.noData = (data.totalAnalyzerResult === 0);
+
             // config output data
             vm.analyzerResults.forEach(function(analyzerResult) {
               // set all result is unchecked
@@ -119,64 +124,38 @@ angular.module('openAim')
         }, function() {
           console.log(Constant.msg.analyzerResult.MSG_LOAD_DATA_UNSUCCESS + new Date());
           return false;
+        })
+        .finally(function() {
+          vm.loading = false;
         });
       },
 
       /**
         auto insert all test results to OpenELIS system
       */
-      onAutoInsert: function() {
-        if(vm.autoInsert) {
-          // init data
-          var ids = Constant.ALL,
-            data = {},
-            properties = {};
-          properties = { status: Constant.testResultStatus.SAVED };
-          data = {
-            ids: ids,
-            properties: properties
-          };
-          // call API to send test results to LIS sytem and reload page
-          vm.updateStatus(data).then(function() {
-            vm.getAnalyzerResults(vm.search.status);
-            console.log(Constant.msg.analyzerResult.MSG_UPDATE_DATA_SUCCESS + new Date());
-          }, function() {
-            console.log(Constant.msg.analyzerResult.MSG_UPDATE_DATA_UNSUCCESS + new Date());
-          });
-        }
+      onAutoInsertChange: function() {
+        // Update system config auto-insert in database
+        var isAutoInsert = vm.autoInsert.toString();
+        vm.autoInsertObj.value = isAutoInsert;
+        Setting.save(vm.autoInsertObj.key, vm.autoInsertObj)
+        .then(vm.getAutoInsert);
       },
 
       /**
        * Increase or decrease countCheck when user checks or unchecks record
-       * then disable or enable Delete button and Deselect All button
        * @param  {Boolean} isCheck
        */
       check: function (isCheck) {
         vm.selectAll = false;
-        if (isCheck) {
-          vm.countCheck ++;
-        } else {
-          vm.countCheck --;
-        }
-        if (vm.countCheck > 0) {
-          vm.disabledDelBtn = false;
-          vm.disabledDeSelectAllBtn = false;
-        } else {
-          vm.disabledDelBtn = true;
-          vm.disabledDeSelectAllBtn = true;
-        }
+        vm.countCheck = isCheck ? ++vm.countCheck : --vm.countCheck;
+        vm.disabledDelBtn = (vm.countCheck > 0 & !vm.loading) ? false : true;
       },
 
       /**
         select all or deselect all analyzer results
       */
       checkAll: function() {
-        var checkNumber;
-        if (vm.selectAll) {
-          checkNumber = 1;
-        } else {
-          checkNumber = -1;
-        }
+        var checkNumber = vm.selectAll ? 1 : -1;
         vm.analyzerResults.forEach(function(analyzerResult) {
           if (analyzerResult.selected != vm.selectAll) {
           analyzerResult.selected = vm.selectAll;
@@ -184,7 +163,6 @@ angular.module('openAim')
           }
         });
         vm.disabledDelBtn = !vm.selectAll;
-        vm.disabledDeSelectAllBtn = !vm.selectAll;
       },
 
       /**
@@ -203,49 +181,30 @@ angular.module('openAim')
       updateStatus: function(data) {
         // TODO: get data and send to API via the put method
         // return promise
+        vm.loading = true;
         var deferred = $q.defer();
-        analyzerResultsRes.update(data).$promise
+        Api.AnalyzerResult.update(data).$promise
           .then(function(res) {
-            $uibModal.open({
-              templateUrl: 'alert-success-modal',
-              controller: 'AlertSuccessModalTestResultCtrl',
-              size: 'sm',
-              animation: true,
-              resolve: {
-                info: function () {
-                  return res;
-                }
-              }
-            });
+//            ModalService.successTransfer(res);
             deferred.resolve();
           })
           .catch(function (err) {
             deferred.reject(err.data);
-            var alertErrorModal = $uibModal.open({
-              templateUrl: 'alert-error-modal',
-              controller: 'AlertErrorModalTestResultCtrl',
-              size: 'sm',
-              animation: true,
-              resolve: {
-                accessionNumberLength: function () {
-                  return false;
-                },
-                errorMessage: function () {
-                  console.log(err.data);
-                  return err.data;
-                }
-              }
-            });
+            var alertErrorModal = ModalService.error(err.data);
             // open error message modal
             return alertErrorModal.result.then(function() {
               vm.getAnalyzerResults(vm.search.status);
             });
+          })
+          .finally(function() {
+            vm.loading = false;
           });
         return deferred.promise;
       },
+
       updateAccessionNumber: function(data) {
         var deferred = $q.defer();
-        analyzerResultsRes.update({ id: data._id }, data).$promise
+        Api.AnalyzerResult.update({ id: data._id }, data).$promise
           .then(function() {
             deferred.resolve();
           })
@@ -258,31 +217,49 @@ angular.module('openAim')
       /**
         save the test results of current page into main tables
       */
-      onResultEntry: function() {
+      onResultEntry: function(notShowMessage) {
+        // Check analyzer result is empty
+        if (vm.noData) {
+          return ModalService.error(Constant.testResultError.ANALYZER_RESULT_EMPTY);
+        }
         // init
         var ids = [],
             data = {},
-            properties = {};
+            properties = {},
+            less10Characters = false;
         // collect data, push all records id of current page to ids
-        vm.analyzerResults.forEach(function(analyzerResult) {
-             ids.push(analyzerResult._id);
-        });
-        properties = { status: Constant.testResultStatus.SAVED };
-        data = {
-          ids: ids,
-          properties: properties
-        };
-        // call API
-        if(data.ids.length>0) {
-          vm.updateStatus(data).then(function() {
-            vm.getAnalyzerResults(vm.search.status);
-            console.log(Constant.msg.analyzerResult.MSG_UPDATE_DATA_SUCCESS + new Date());
-          }, function() {
-            console.log(Constant.msg.analyzerResult.MSG_UPDATE_DATA_UNSUCCESS + new Date());
+        vm.getAnalyzerResults(vm.search.status, true).then(function () {
+          vm.analyzerResults.forEach(function(analyzerResult) {
+            var strAccessionNumber = analyzerResult.accessionNumber.trim();
+            if (strAccessionNumber.length == 10) {
+              ids.push(analyzerResult._id);
+            } else {
+              less10Characters = true;
+            }
           });
-        }
+          // Do not transfer tests which have accession number < 10 characters
+          if (less10Characters && !notShowMessage) {
+            ModalService.error(Constant.testResultError.LESS10_ACCESSIONUMBER);
+          }
+          properties = { status: Constant.testResultStatus.SAVED };
+          data = {
+            ids: ids,
+            properties: properties
+          };
+          // call API
+          if(data.ids.length>0) {
+            // Disabled delete button
+            vm.disabledDelBtn = true;
+            vm.updateStatus(data).then(function() {
+              vm.getAnalyzerResults(vm.search.status);
+              console.log(Constant.msg.analyzerResult.MSG_UPDATE_DATA_SUCCESS + new Date());
+            }, function() {
+              console.log(Constant.msg.analyzerResult.MSG_UPDATE_DATA_UNSUCCESS + new Date());
+            });
+          }
+        });
       },
-
+      
       /**
         search test results
       */
@@ -307,20 +284,7 @@ angular.module('openAim')
         var accNumber = analyzerResult.accessionNumber;
         if (!accNumber || accNumber.length < Constant.testResultView.accessionNumberLength ||
          accNumber.length > Constant.testResultView.accessionNumberLength) {
-          var alertErrorModal = $uibModal.open({
-                templateUrl: 'alert-error-modal',
-                controller: 'AlertErrorModalTestResultCtrl',
-                size: 'sm',
-                animation: true,
-                resolve: {
-                  accessionNumberLength: function () {
-                    return true;
-                  },
-                  errorMessage: function () {
-                    return Constant.testResultError.EDIT_ACCESSIONUMBER;
-                  }
-                }
-            });
+          var alertErrorModal = ModalService.error(Constant.testResultError.EDIT_ACCESSIONUMBER, true);
             // open error message modal
             return alertErrorModal.result.then(function() {
               vm.getAnalyzerResults(vm.search.status);
@@ -364,18 +328,7 @@ angular.module('openAim')
 
         if(ids.length>0) {
           // define delete confirmation modal
-          var confirmDelete = $uibModal.open({
-            templateUrl: 'confirmDeleteResults',
-            controller: 'ConfirmDeleteResultCtrl',
-            size: 'sm',
-            animation: true,
-            backdrop: "static",
-            resolve: {
-              ids: function() {
-                return ids;
-              }
-            }
-          });
+          var confirmDelete = ModalService.confirmDelete(ids);
           // open delete confirmation modal and delete records
           confirmDelete.result.then(function (ids) {
             $http({
@@ -394,53 +347,75 @@ angular.module('openAim')
             });
           });
         }
-      }
+      },
 
+      getAutoInsert: function() {
+        Setting.get(Constant.setting.AUTO_INSERT)
+        .then(function (setting) {
+          vm.autoInsertObj = setting;
+          vm.autoInsert = vm.autoInsertObj.value === 'true' ? true : false;
+        });
+      },
+
+      createAnalyzerResult: function(accNumber, result) {
+        var analyzerResult = angular.extend(angular.copy(result), { accessionNumber: accNumber, testType: null });
+        // Remove id.
+        delete analyzerResult["_id"];
+        return analyzerResult;
+      },
+
+      /**
+       * Create analyzer results from accession numbers.
+       */
+      saveAccessionNumbers: function(analyzerResult, accessionNumbers) {
+        // failResults save accession numbers have already exited in db
+        var addAccNumbersModal = ModalService.addAccNumber(analyzerResult, accessionNumbers),
+            saveAccessionNumPromises = [];
+        addAccNumbersModal.result.then(function(accessionNumberInputs) {
+            saveAccessionNumPromises = accessionNumberInputs.map(function(accessionNumberInput) {
+            var resultObj = vm.createAnalyzerResult(accessionNumberInput.value, analyzerResult);
+            return Api.AnalyzerResult.save(resultObj).$promise;
+          });
+
+          $q.all(saveAccessionNumPromises).then(function(testResultRes) {
+            var failResults = _.filter(testResultRes, { 'success': false });
+            if (failResults.length !== 0) {
+              failResults = failResults.map(function(result) { return result.data; });
+              var failAccessionNumberModal = ModalService.failSaveAccNumber(failResults);
+              failAccessionNumberModal.result.then(function(accessionNumbers) {
+                vm.saveAccessionNumbers(analyzerResult, accessionNumbers);
+              });
+            }
+            vm.getAnalyzerResults();
+          });
+        });
+      },
+
+      editAccNumber: function(analyzerResult, editAccNumberFrm) {
+        if (analyzerResult.testType !== Constant.POOL || analyzerResult.resultStr === Constant.testResultStr.POSITIVE) {
+          return editAccNumberFrm.$show();
+        }
+        // if test is pool specimen
+        vm.saveAccessionNumbers(analyzerResult);
+      }
+      
     });
 
     // on page loaded
+    vm.getAutoInsert();
     vm.search.status = Constant.testResultStatus.NEW;
     vm.getAnalyzerResults(vm.search.status);
     vm.getAnalyzers();
-    // set interval, auto insert to LIS every 5 minutes if checkbox is checked and reload data.
-    $interval(function() {
-      console.log("Run auto load at " + new Date());
-      vm.onAutoInsert();
-      vm.getAnalyzerResults(vm.search.status);
-    }, 300000);
-  })
 
-  .controller('ConfirmDeleteResultCtrl', function ($scope, $uibModalInstance, ids) {
-    $scope.ok = function () {
-      $scope.ids = ids;
-      $uibModalInstance.close($scope.ids);
-    };
-    $scope.cancel = function () {
-      $uibModalInstance.dismiss('cancel');
-    };
-  })
-  .controller('AlertErrorModalTestResultCtrl', function ($scope, $uibModalInstance, Constant, accessionNumberLength, errorMessage) {
-    if (accessionNumberLength) {
-      $scope.translationData = {
-        accessionNumberLength: Constant.testResultView.accessionNumberLength
-      };
-    }
-    $scope.errorMessage = errorMessage;
-    $scope.close = function () {
-      $uibModalInstance.close();
-    };
-  })
-  .controller('AlertSuccessModalTestResultCtrl', function ($scope, $uibModalInstance, info) {
-    $scope.translationData = {
-      total: info.totalAnalyzerResult,
-      success: info.success,
-      fail: info.fail
-    };
-    $scope.info = 'INFO_TRANSFER';
-    $scope.total = 'INFO_TOTAL';
-    $scope.success = 'INFO_SUCCESS';
-    $scope.fail = 'INFO_FAIL';
-    $scope.close = function () {
-      $uibModalInstance.close();
-    };
+    // Using $interval service to send analyzers-test-result every 60 seconds
+    var annalyzerResultRefreshInterval = $interval( function(){
+      if (vm.autoInsert && !vm.noData) {
+//        var notShowMessage = true;
+//        vm.onResultEntry(notShowMessage);
+      }
+    }, 30000);
+    vm.removeListener = $rootScope.$on('$stateChangeStart', function() {
+      $interval.cancel(annalyzerResultRefreshInterval);
+      vm.removeListener();
+    });
   });

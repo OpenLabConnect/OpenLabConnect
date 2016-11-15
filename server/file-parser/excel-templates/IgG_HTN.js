@@ -30,7 +30,7 @@ let Column = Config.CONST().column;
       testId,
       workSheet = this.workSheet,
       me = this;
-    if (!this._getTestCode()) { return Promise.resolve(Config.CONST().errorMessage.testCodeDoesNotExists.code) }
+    if (!this._getTestCode()) { return Promise.resolve(Config.CONST().errorMessage.testCodeDoesNotExists.code); }
     return AnalyzerTestMap.find({ testCode: this._getTestCode() })
     .populate('analyzer')
     .populate('test')
@@ -46,7 +46,7 @@ let Column = Config.CONST().column;
       testMaps[0] = testMapRes[0];
       testName = workSheet[Column[testNameCell.c] + testNameCell.r].w;
       for (let i = 0; i < me.templateConfig.tests.length; i++) {
-        if (testName.trim() == me.templateConfig.tests[i].name) {
+        if (testName.trim() === me.templateConfig.tests[i].name) {
           testId = me.templateConfig.tests[i].id;
         }
       }
@@ -61,7 +61,7 @@ let Column = Config.CONST().column;
         return testMaps;
       });
     });
-  }
+  };
   this.getTestResults = function (template) {
     if (!this._checkWorkSheet()) { return false; }
   	let testResults = [],

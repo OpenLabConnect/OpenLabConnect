@@ -1,7 +1,7 @@
 'use strict';
 let Template = require('./template');
 
- module.exports = function templateIgMDen (workSheet, template) {
+ module.exports = function templateIgGDen (workSheet, template) {
   Template.apply(this, arguments);
   // Override variable
   this.templateConfig = {
@@ -15,4 +15,4 @@ let Template = require('./template');
       colOD: 7
     }
   };
- }
+ };

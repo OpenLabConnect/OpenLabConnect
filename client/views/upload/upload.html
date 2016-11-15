@@ -3,6 +3,10 @@
     <h2 class="page-title text-primary">{{ 'TITLE_UPLOAD' | translate }}</h2>
   </div>
 </div>
+<div class="alert alert-info" style="width:500px;">
+  {{ 'AUTO_INSERT_INTOLIS' | translate }}
+  <a ui-sref="test-result" title="{{ 'EDIT' | translate }}" class="auto-insert"> {{ vm.autoInsert | translate }}</a>
+</div>
 <form id="formUpload" ng-submit="vm.uploadFile()" style="width:500px;">
   <div class="form-group">
     <label class="control-label">{{ 'test.BEGIN_DATE' | translate }}</label>
@@ -29,31 +33,5 @@
 	$("#input-id").fileinput({ allowedFileExtensions: ["xlsb", "xlsx", "xlsm", "xls", "xml", "asy"], 'showPreview' : false });
 </script>
 
-<script type="text/ng-template" id="alertModal">
-  <div class="modal-header">
-    <h3 class="modal-title">{{ 'TITLE_UPLOAD' | translate }}</h3>
-  </div>
-  <div class="modal-body">
-    <h4>{{ 'upload.success' | translate }}</h4>
-  </div>
-  <div class="modal-footer">
-    <button class="btn btn-danger" type="button" ng-click="ok()">
-      {{ 'OK' | translate }}
-    </button>
-  </div>
-</script>
-<script type="text/ng-template" id="failedModal">
-  <div class="modal-header">
-    <h3 class="modal-title">{{ 'TITLE_UPLOAD' | translate }}</h3>
-  </div>
-  <div class="modal-body">
-    <h4>{{ 'upload.failed' | translate }}</h4>
-    <p>{{ error | translate }}</p>
-  </div>
-  <div class="modal-footer">
-    <button class="btn btn-danger" type="button" ng-click="ok()">
-      {{ 'OK' | translate }}
-    </button>
-  </div>
-</script>
+
 

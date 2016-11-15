@@ -2,17 +2,18 @@
 exports.CONST = function () {
   // Error Code
   const errorMessage = {
-    templatesWasNotFound: { code: '0', description: 'Template has not been implemented.'},
-    testMapIsNotFull: { code: '1', description: 'Test Map is not full.'},
-    testCodeInvalid: { code: '2', description: 'Test code was not found.'},
-    analyzerIsNotActive: { code: '3', description: 'Analyzer is not active.'},
-    fileMissingData: { code: '4', description: 'File upload is missing test-name or test-name is incorrect. Please check your file.'},
-    testCodeDoesNotExists: { code: '5', description: 'Test Code does not exists. Please choose right file with right template.'},
-    sheetNameIncorrect: { code: '6', description: 'Sheet name of file is incorrect. Please check your file.'},
+    templatesWasNotFound: { code: '0', description: 'Template has not been implemented.' },
+    testMapIsNotFull: { code: '1', description: 'Test Map is not full.' },
+    testCodeInvalid: { code: '2', description: 'Test code was not found.' },
+    analyzerIsNotActive: { code: '3', description: 'Analyzer is not active.' },
+    fileMissingData: { code: '4', description: 'File upload is missing test-name or test-name is incorrect. Please check your file.' },
+    testCodeDoesNotExists: { code: '5', description: 'Test Code does not exists. Please choose right file with right template.' },
+    sheetNameIncorrect: { code: '6', description: 'Sheet name of file is incorrect. Please check your file.' },
     templateUnderfined: { code: '7', description: 'Template is underfined.' },
-    testNotExist: { code: '8', description: 'Test is not exists on database.'},
-    analyzerNotExist: { code: '9', description: 'Analyzer is not exists on database.'},
-    templateAndFileIsNotMap: { code: '10', description: 'Template and file is not map.'}
+    testNotExist: { code: '8', description: 'Test is not exists on database.' },
+    analyzerNotExist: { code: '9', description: 'Analyzer is not exists on database.' },
+    templateAndFileIsNotMap: { code: '10', description: 'Template and file is not map.' },
+    duplicateTestResult: { code: '11', description: 'Test result is already an existing result. Please delete it before adding a new one.' }
   };
   // Table name
   const tableName = {
@@ -36,9 +37,9 @@ exports.CONST = function () {
     { key: 'Je(+)', result: 1 }
   ];
   const briefHistoryResultConvert = [
-    { result: '1', brief: 'Positive'},
-    { result: '-1', brief: 'Negative'},
-    { result: '0', brief: 'Unknown'},
+    { result: '1', brief: 'Positive' },
+    { result: '-1', brief: 'Negative' },
+    { result: '0', brief: 'Unknown' }
   ];
   // Test Type
   const testType = {
@@ -46,10 +47,14 @@ exports.CONST = function () {
     value: 'value'
   };
   // Location Templates
-  const locationTemplates = './server/parser/templates/';
-  const locationTemplatesAsy = './server/parser/asy-templates/';
-  const requireTemplates = './templates/';
-  const requireAsyTemplate = './asy-templates/';
+  const templateLocation = {
+    excel: './server/file-parser/excel-templates/',
+    asy: './server/file-parser/asy-templates/'
+  };
+  const templateRequire = {
+    excel: './excel-templates/',
+    asy: './asy-templates/'
+  };
   // Template Analyzers
   const templates = [
     // IgM DEN Template
@@ -100,26 +105,29 @@ exports.CONST = function () {
       fileNameJS: 'asy'
     }
   ];
+
+  const analyzerName = 'Excel';
+
   const asy = {
     accessionNumber: 'SAMPLENAME=',
     result: 'CT0=',
     qualitativeValue: 38,
     qualitative: '(Định Tính)',
     quantitative: '(Định Lượng)',
+    analyzerName: 'Eppendorf'
   };
 
   return {
     tableName: tableName,
     column: column,
     templates: templates,
-    locationTemplates: locationTemplates,
-    locationTemplatesAsy: locationTemplatesAsy,
+    templateLocation: templateLocation,
+    templateRequire: templateRequire,
     asy: asy,
-    requireTemplates: requireTemplates,
-    requireAsyTemplate: requireAsyTemplate,
     resultConvert: resultConvert,
     briefHistoryResultConvert: briefHistoryResultConvert,
     testType: testType,
-    errorMessage: errorMessage
+    errorMessage: errorMessage,
+    analyzerName: analyzerName
   };
 };

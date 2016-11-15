@@ -1,7 +1,7 @@
 'use strict';
 
 angular.module('openAim')
-  .controller('assignStaffCtrl', function (analyzerRes, Constant, $q) {
+  .controller('assignStaffCtrl', function (Api, Constant, $q) {
 
     var vm = this;
 
@@ -22,7 +22,7 @@ angular.module('openAim')
         get all analyzers
       */
       getAnalyzers: function(){
-        analyzerRes.query().$promise.then(function(data) {
+        Api.Analyzer.query().$promise.then(function(data) {
           console.log(Constant.msg.analyzer.MSG_LOAD_DATA_SUCCESS + new Date());
           vm.analyzers = data;
           return vm.analyzers;
@@ -48,7 +48,7 @@ angular.module('openAim')
        */
       assignStaff: function(staffName) {
         var deferred = $q.defer();
-        analyzerRes.update({ id: staffName._id }, staffName).$promise
+        Api.Analyzer.update({ id: staffName._id }, staffName).$promise
           .then(function() {
             deferred.resolve();
           })

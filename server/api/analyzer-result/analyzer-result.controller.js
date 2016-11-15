@@ -43,6 +43,36 @@ function trackAnalyzerResult (objHistory) {
     });
   });
 }
+
+ // Check the results already exists
+function checkDuplicate(analyzerResult) {
+  let date = new Date(analyzerResult.beginDate);
+    date = DateTimeUtil.toUTC(date);
+    date = DateTimeUtil.toISO(date);
+  let gte = date + 'T00:00:00Z';
+  let lte = date + 'T23:59:59Z';
+
+  return AnalyzerResultModel.find({ accessionNumber: analyzerResult.accessionNumber, test: analyzerResult.test, beginDate: { $gte: gte, $lte: lte } })
+    .populate({
+      path: 'test',
+      match: { testId: analyzerResult.test.testId }
+    })
+    .populate({
+      path: 'result',
+      populate: {
+        path: 'type'
+      }
+    })
+    .exec()
+    .then(function(result) {
+      if (result.length !== 0) {
+        return Promise.reject(analyzerResult);
+      }
+      return analyzerResult;
+    });
+
+}
+
 /**
  * Creating new analyzerResultModel in the DB.
  *
@@ -50,74 +80,80 @@ function trackAnalyzerResult (objHistory) {
  * @param res
  */
 exports.create = function (req, res) {
-  AnalyzerResultModel.create(req.body, function (err, analyzerResult) {
-    if (err) { return handleError(res, err); }
-    AnalyzerResultModel.findById(analyzerResult._id)
-    .populate('analyzer')
-    .populate('test')
-    .populate('result')
-    .exec(function (err, analyzerResult) {
+  var result = req.body;
+  checkDuplicate(result)
+  .then(function(analyzerResult) {
+    AnalyzerResultModel.create(analyzerResult, function (err, analyzerResult) {
       if (err) { return handleError(res, err); }
-      if (!analyzerResult) { return res.json(401); }
-      // Tracking log for analyzerTestMap.
       AnalyzerResultModel.findById(analyzerResult._id)
       .populate('analyzer')
       .populate('test')
-      .populate(
-      {
-        path: 'result',
-        populate: {
-          path: 'type'
-        }
-      })
-      .exec(function (err, analyzerResultModel) {
+      .populate('result')
+      .exec(function (err, analyzerResult) {
         if (err) { return handleError(res, err); }
-        if (!analyzerResultModel) { return res.json(401); }
-        var objHistory = {};
-        objHistory.brief = '';
-        if (analyzerResult.accessionNumber) {
-          objHistory.brief += '\nAccession Number: ' + analyzerResult.accessionNumber;
-        }
-        if (analyzerResult.test) {
-          objHistory.test = analyzerResult.test;
-          objHistory.brief += '\nTest name: ' + analyzerResult.test.name;
-        }
-        if (analyzerResult.result) {
-          var convertTestResult = '';
-          if (analyzerResult.result.type.name === TEST_RESULT) {
-            convertTestResult = mapTestResult[analyzerResult.result.result];
-            if (!convertTestResult) {
+        if (!analyzerResult) { return res.json(401); }
+        // Tracking log for analyzerTestMap.
+        AnalyzerResultModel.findById(analyzerResult._id)
+        .populate('analyzer')
+        .populate('test')
+        .populate(
+        {
+          path: 'result',
+          populate: {
+            path: 'type'
+          }
+        })
+        .exec(function (err, analyzerResultModel) {
+          if (err) {return handleError(res, err); }
+          if (!analyzerResultModel) { return res.json(401); }
+          var objHistory = {};
+          objHistory.brief = '';
+          if (analyzerResult.accessionNumber) {
+            objHistory.brief += '\nAccession Number: ' + analyzerResult.accessionNumber;
+          }
+          if (analyzerResult.test) {
+            objHistory.test = analyzerResult.test;
+            objHistory.brief += '\nTest name: ' + analyzerResult.test.name;
+          }
+          if (analyzerResult.result) {
+            var convertTestResult = '';
+            if (analyzerResult.result.type.name === TEST_RESULT) {
+              convertTestResult = mapTestResult[analyzerResult.result.result];
+              if (!convertTestResult) {
+                convertTestResult = analyzerResult.result.result;
+              }
+            } else {
               convertTestResult = analyzerResult.result.result;
             }
-          } else {
-            convertTestResult = analyzerResult.result.result;
+            objHistory.brief += '\nTest Result: ' + convertTestResult;
           }
-          objHistory.brief += '\nTest Result: ' + convertTestResult;
-        }
-        if (analyzerResult.analyzer) {
-          objHistory.analyzer = analyzerResult.analyzer;
-          objHistory.brief += '\nAnalyzer name: ' + analyzerResult.analyzer.name;
-        }
-        objHistory.brief += '\nTest result status: ' + analyzerResult.status;
-        if (analyzerResult.receivedDate) {
-          var logTime = DateTimeUtil.toGMT(analyzerResult.receivedDate);
-          objHistory.brief += '\nReceived date: ' + logTime;
-        }
-        if (analyzerResult.beginDate) {
-          var beginDate = DateTimeUtil.toGMT(analyzerResult.beginDate);
-          objHistory.brief += 'Begin date: ' + beginDate;
-        }
-        if (analyzerResult.performedBy) {
-          objHistory.brief += 'Performed by: ' + analyzerResult.performedBy;
-        }
-        objHistory.user = req.user.email;
-        objHistory.action = 'Create analyzer result';
-        objHistory.timestamp = new Date();
-        objHistory.data = JSON.stringify(analyzerResult);
-        trackAnalyzerResult(objHistory);
+          if (analyzerResult.analyzer) {
+            objHistory.analyzer = analyzerResult.analyzer;
+            objHistory.brief += '\nAnalyzer name: ' + analyzerResult.analyzer.name;
+          }
+          objHistory.brief += '\nTest result status: ' + analyzerResult.status;
+          if (analyzerResult.receivedDate) {
+            var logTime = DateTimeUtil.toGMT(analyzerResult.receivedDate);
+            objHistory.brief += '\nReceived date: ' + logTime;
+          }
+          if (analyzerResult.beginDate) {
+            var beginDate = DateTimeUtil.toGMT(analyzerResult.beginDate);
+            objHistory.brief += 'Begin date: ' + beginDate;
+          }
+          if (analyzerResult.performedBy) {
+            objHistory.brief += 'Performed by: ' + analyzerResult.performedBy;
+          }
+          objHistory.user = req.user.email;
+          objHistory.action = 'Create analyzer result';
+          objHistory.timestamp = new Date();
+          objHistory.data = JSON.stringify(analyzerResult);
+          trackAnalyzerResult(objHistory);
+        });
+        res.status(201).json({success: true, data: _.omit(analyzerResult.toObject(), ['__v'])});
       });
-      res.status(201).json(_.omit(analyzerResult.toObject(), ['__v']));
     });
+  }, function(analyzerResult) {
+    return res.status(200).json({success: false, data: analyzerResult.accessionNumber});
   });
 };
 
@@ -202,13 +238,18 @@ function createUniqueAnalyzerResults (dataPackage) {
 function createImportData (dataPackage) {
   var listPromise = [];
   listPromise = dataPackage.uniqueAnalyzerResult.map(function (uniqueResult) {
-    var date = DateTimeUtil.toISO(uniqueResult.receivedDate);
+    var beginDate = DateTimeUtil.toUTC(uniqueResult.beginDate);
+    var date = DateTimeUtil.toISO(beginDate);
     var gte = date + 'T00:00:00Z';
     var lte = date + 'T23:59:59Z';
 
     return AnalyzerResultModel
-    .find({ accessionNumber: uniqueResult.accessionNumber, test: uniqueResult.test, receivedDate: { $gte: gte, $lte: lte }})
-    .populate('analyzer')
+    .find({ accessionNumber: uniqueResult.accessionNumber, test: uniqueResult.test, beginDate: { $gte: gte, $lte: lte }})
+    .populate(
+    {
+      path: 'analyzer',
+      match: { _id: uniqueResult.analyzer._id }
+    })
     .populate({
       path: 'test',
       match: { testId: uniqueResult.test.testId }
@@ -219,7 +260,11 @@ function createImportData (dataPackage) {
         path: 'type'
       }
     })
-    .exec();
+    .exec().then(function (analyzerResult) {
+      // Sorting AnalyzerResult by result type to handle case: AnalyzerResults have duplicate test type
+      analyzerResult = _.sortedUniqBy(analyzerResult, _.property(uniqueResult.result.type.name));
+      return Promise.resolve(analyzerResult);
+    });
   });
   return Promise.all(listPromise).then(function(all) {
     dataPackage.totalAnalyzerResult = _.flatten(all).length;
@@ -264,10 +309,7 @@ function checkResponse (dataPackage) {
     return Promise.reject(messages[0].error);
   }
 
-  var transferSuccess = _.chain(messages)
-    .filter({ success: 'success'})
-    .map(_.property('transferResults'))
-    .map(results => _.map(results))
+  var transferSuccess = _.chain(dataPackage.analyzerResults)
     .flatten()
     .value();
 
@@ -421,6 +463,7 @@ function handleTransferResult (ids, value) {
     .then(trackTransfer)
     .then(trackErrorTransfer);
 }
+exports.handleTransferResult = handleTransferResult;
 /**
  * Updating analyzerResult by IDs.
  *
@@ -447,10 +490,14 @@ exports.updateByIds = function (request, response) {
     updateValues.user = request.user.email;
   }
   return handleTransferResult(listIds, updateValues).then(function (res) {
-    return response.status(200).json(res);
+    if (response) {
+      return response.status(200).json(res);
+    }
   },function(err){
     console.log(err);
-    return handleError(response, err);
+    if (response) {
+      return handleError(response, err);
+    }
   });
 };
 /**

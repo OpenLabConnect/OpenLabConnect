@@ -17,7 +17,7 @@
       </thead>
       <tbody>
         <tr ng-repeat = "analyzer in vm.analyzers">
-          <td class="text-center"><input type="checkbox" ng-model="analyzer.selected"/></td>
+          <td class="text-center"><input type="checkbox" ng-model="analyzer.selected" ng-change="vm.checked(analyzer)"/></td>
           <td>{{ analyzer.name }}</td>
           <td>{{ analyzer.params }}</td>
           <td>{{ analyzer.port }}</td>
@@ -32,16 +32,16 @@
 </div>
 <div class="row">
   <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
-    <button type="button" class="btn btn-primary" ng-click='vm.updateAnalyzersStatus(false, true)'>
+    <button type="button" class="btn btn-primary" ng-click='vm.updateAnalyzersStatus(false, true)' ng-disabled="vm.isActive || !vm.isCheck">
       {{ 'analyzer.action.OPEN' | translate }}
     </button>
-    <button type="button" class="btn btn-primary" ng-click='vm.updateAnalyzersStatus(true, true)'>
+    <button type="button" class="btn btn-primary" ng-click='vm.updateAnalyzersStatus(true, true)' ng-disabled="vm.allActive && !vm.intricacy">
       {{ 'analyzer.action.OPEN_ALL' | translate }}
     </button>
-    <button type="button" class="btn btn-default" ng-click='vm.updateAnalyzersStatus(false, false)'>
+    <button type="button" class="btn btn-default" ng-click='vm.updateAnalyzersStatus(false, false)' ng-disabled="!vm.isActive || !vm.isCheck">
      {{ 'analyzer.action.CLOSE' | translate }}
     </button>
-    <button type="button" class="btn btn-default" ng-click='vm.updateAnalyzersStatus(true, false)'>
+    <button type="button" class="btn btn-default" ng-click='vm.updateAnalyzersStatus(true, false)' ng-disabled="!vm.allActive && !vm.intricacy">
       {{ 'analyzer.action.CLOSE_ALL' | translate }}
     </button>
   </div>

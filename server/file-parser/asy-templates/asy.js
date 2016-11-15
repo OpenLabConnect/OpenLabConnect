@@ -11,45 +11,41 @@ let asyConfig = CONST.asy;
  * @param  {string} testCode
  * @return testMaps
  */
-function getAnalyzer (dataPackage) {
-  return Analyzer.findOne({ name: dataPackage.analyzerName })
-  .exec()
-  .then(function (analyzer) {
-    dataPackage.analyzer = analyzer;
-    return dataPackage;
-  });
+function getAnalyzer(dataPackage) {
+  return Analyzer.findOne({ name: asyConfig.analyzerName })
+    .exec()
+    .then(function(analyzer) {
+      dataPackage.analyzer = analyzer;
+      return dataPackage;
+    });
 }
 
-function getTest (dataPackage) {
+function getTest(dataPackage) {
   return Test.findOne({ testId: dataPackage.testId })
-  .exec()
-  .then(function (test) {
-    dataPackage.test = test;
-    return dataPackage;
-  });
+    .exec()
+    .then(function(test) {
+      dataPackage.test = test;
+      return dataPackage;
+    });
 }
 
-function getTestMap (dataPackage) {
-  return AnalyzerTestMap.find({ testCode: dataPackage.testCode })
-  .populate('analyzer')
-  .populate('test')
-  .exec()
-  .then(function (testMaps) {
-    // Test code invalids
-    if (testMaps.length === 0) {
-      return {
-        success: false,
-        data: CONST.errorMessage.testCodeInvalid
-      };
-    }
-    return {
-      success: true,
-      data: {
-       testMaps: testMaps,
-       testResults: dataPackage.testResults
+function getTestMap(dataPackage) {
+  let id = dataPackage.analyzer.id;
+  return AnalyzerTestMap.find({ testCode: dataPackage.testCode, analyzer: id})
+    .populate('analyzer')
+    .populate('test')
+    .exec()
+    .then(function(testMaps) {
+      // Test code invalids
+      if (testMaps.length === 0) {
+        return Promise.reject(CONST.errorMessage.testCodeInvalid);
       }
-    };
-  });
+      return {
+        testMaps: testMaps,
+        testResults: dataPackage.testResults,
+        testCode: dataPackage.testCode
+      };
+    });
 }
 
 /**
@@ -57,7 +53,7 @@ function getTestMap (dataPackage) {
  * @param  {string} data
  * @return {Object} dataPackage
  */
-exports.getData = function (data, templateName) {
+exports.getData = function(data, templateName) {
   let testResults = [],
     testCode,
     testType,
@@ -73,7 +69,7 @@ exports.getData = function (data, templateName) {
   // testCode = template[1];
   // testType = template[2];
 
-  for(let i in data) {
+  for (let i in data) {
     let accessionNumberKey = asyConfig.accessionNumber,
       resultKey = asyConfig.result;
 
@@ -81,7 +77,7 @@ exports.getData = function (data, templateName) {
       testResult.accessionNumber = data[i].substring(accessionNumberKey.length);
       continue;
     }
-    if(data[i].search(resultKey) > -1) {
+    if (data[i].search(resultKey) > -1) {
       let rawResult = data[i].substring(resultKey.length);
       // Convert result with qual qualitative template
       if (testType === asyConfig.qualitative) {
@@ -113,8 +109,8 @@ exports.getData = function (data, templateName) {
         type: CONST.testType.result,
         testMapOrder: 0
       }];
-      let firstTestResult = _.find(testResults,{ accessionNumber: testResult.accessionNumber });
-      if(!firstTestResult) {
+      let firstTestResult = _.find(testResults, { accessionNumber: testResult.accessionNumber });
+      if (!firstTestResult) {
         testResults.push(testResult);
       } else {
         // Check second result !== first result. If true remove all both result.
@@ -131,6 +127,6 @@ exports.getData = function (data, templateName) {
   dataPackage.testCode = testCode;
 
   return getAnalyzer(dataPackage)
-  .then(getTest)
-  .then(getTestMap);
+    .then(getTest)
+    .then(getTestMap);
 };
