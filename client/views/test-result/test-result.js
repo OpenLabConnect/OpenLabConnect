@@ -1,7 +1,7 @@
 'use strict';
 
 angular.module('openAim')
-  .config(function ($stateProvider) {
+  .config(function($stateProvider) {
     $stateProvider
       .state('test-result', {
         url: '/test-result',
@@ -9,12 +9,5 @@ angular.module('openAim')
         controller: 'TestResultCtrl',
         controllerAs: 'vm'
       });
-  })
+  });
 
-  .factory('analyzerResultsRes', ['$resource', 'Constant', function($resource, Constant) {
-    return $resource(Constant.serviceURL.ANALYZER_RESULTS, {},
-    {
-      'update': { method:'PUT' },
-      'searchAnalyzers': { method:'GET' }
-    });
-  }]);

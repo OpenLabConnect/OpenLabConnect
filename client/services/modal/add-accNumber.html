@@ -1,0 +1,48 @@
+  <div class="modal-header">
+    <button type="button" class="close" data-dismiss="modal">&times;</button>
+    <h4 class="modal-title">{{ 'ADD_ACCESSION_NUMBER' | translate }} {{ accessionNumber }}</h4>
+    <h5 class="modal-title">{{ 'TEST_NAME' | translate }} {{ testName }}</h5>
+    <h5 class="modal-title">{{ 'TEST_RESULT' | translate }} {{ result | translate }}</h5>
+    <h5 class="modal-title">{{ 'BEGIN_DATE' | translate }} {{ beginDate | date:'dd/MM/yyyy':'UTC' }}</h5>
+  </div>
+
+  <div class="modal-body add-accession-number-modal">
+    <form id="form" method="post" class = "form-horizontal" name="addForm">
+
+      <fieldset ng-repeat="accessionNumberInput in accessionNumberInputs">
+        <div class="form-group">
+          <div class="col-xs-10">
+            <input class="form-control" ng-model="accessionNumberInput.value" type="text" name="accessionNumberInput"
+               ng-change="checkInputData()"
+              placeholder="{{ 'ACCESSIONUMBER_INPUT' | translate }}" ng-required="true" autocomplete="off"/>
+          </div>
+          <div class="col-md-2">
+              <button ng-show="!$last" type="button" title="Remove" ng-click="removeInput(accessionNumberInput)" class="btn btn-danger">
+                <i class="glyphicon glyphicon-remove"></i>
+              </button>
+              <button title="Add field" ng-show="$last" type="button" ng-click="addInput(accessionNumberInput)" class="btn btn-primary">
+                <i class="glyphicon glyphicon-plus"></i>
+              </button>
+          </div>
+
+        <p class="col-sm-offset-1 text-danger" ng-show="accessionNumberInput.error">
+             {{ accessionNumberInput.errorMessage | translate:translationData }}
+        </p>
+
+      </fieldset>
+
+    </form>
+  </div>
+
+  <div class="modal-footer">
+  <div class="form-group">
+    <div class="col-xs-7">
+    </div>
+    <div class="col-xs-2">
+      <button type="submit" class="btn btn-default" ng-disabled="addForm.$invalid || duplicated" ng-click="save(accessionNumberInputs)">{{ 'SAVE' | translate }}</button>
+    </div>
+    <div class="col-xs-3">
+      <button type="button" class="btn btn-default" data-dismiss="modal" ng-click="cancel()">{{ 'CANCEL' | translate }}</button>
+    </div>
+  </div>
+

@@ -7,6 +7,7 @@ var AnalyzerResultSchema = new Schema({
   analyzer: { type: Schema.Types.ObjectId, ref: 'analyzer' },
   test: { type: Schema.Types.ObjectId, ref: 'test' },
   result: { type: Schema.Types.ObjectId, ref: 'test-result' },
+  testType: String,
   status: String,
   receivedDate: { type: Date, default: Date.now },
   transferDate: Date,

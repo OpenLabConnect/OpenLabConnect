@@ -5,7 +5,11 @@ var _ = require('lodash');
 var AnalyzerModel = require('./analyzer.model');
 var TableModel = require('../table/table.model');
 var HistoryModel = require('../history/history.model');
-
+var AnalyzersConfig = require('./config').CONST();
+var analyzersConnecting = [];
+var cron = require('node-cron');
+// Initial time to update analyzer
+var timeToUpdateAnalyzers = '*/' + AnalyzersConfig.time_minutes + ' * * * *'; // Cron-style Scheduling
 var error_detail = {
   not_found: 'Not found analyzer'
 };
@@ -125,51 +129,56 @@ exports.updateById = function (req, res) {
  * @param res
  */
 exports.updateByIds = function (req, res) {
-  var _ids = {},
-      _values = {};
-  // Validation for req.body.ids
-  if (!_.isEmpty(req.body.ids) && req.body.ids instanceof Array && req.body.ids.length > 0) {
-    _ids = req.body.ids;
-  } else {return handleError(res, 'Bad request.!');}
-  // Validation for req.body.properties
-  if (!_.isEmpty(req.body.properties)) {
-    _values = req.body.properties;
+  var _ids, _values, dataPackage, user = req.user;
+  if (req.body.connecting) {
+    console.log(req.body.name +" connecting \n");
+    analyzersConnecting.push(req.body);
+    return res.status(200).json({ error_code: 0 }); 
   }
-  // Tracking log for updating analyzerTestMap.
-  AnalyzerModel.find({ _id: { $in: _ids } })
-  .exec(function (err, analyzer) {
-    // Handling error
-    if (err) { return handleError(res, err); }
-    if (!analyzer) { return res.json(401); }
-    _.forEach(analyzer, function (value) {
-      var objHistory = {};
-      objHistory.analyzer = value._id;
-      objHistory.user = req.user.email;
-      objHistory.action = 'Update analyzer';
-      objHistory.timestamp = new Date();
-      objHistory.data = JSON.stringify(value);
-      if (value.actived !== _values.actived) {
-        objHistory.brief = 'Updated analyzer: ' + value.name + '\n Changed status from ' + value.actived + ' to ' + _values.actived;
-      }
-      trackAnalyzer(objHistory);
+
+  if (req.body.name) {
+    findByName(req.body.name).then(function (analyzer) {
+      _ids = analyzer._id;
+      _values = { actived: req.body.properties };
+      dataPackage = {
+        user: user,
+        _ids: _ids,
+        _values: _values
+      };
+      return update(dataPackage);
+    }).then(function (){
+      // Return error_code = 0 when analyzers were update
+      res.status(200).json({ error_code: 0 });
+    }).catch(function (error) {
+      return {
+        error_code: 1,
+        error_detail:  handleError(res, error)
+      };
     });
-  });
-  // Updaing list of analyzers (_ids) with _values
-  AnalyzerModel.update({ _id: { $in: _ids } }, _values, { multi: true }, function (err) {
-    // Handling error: return error_code and error_detail
-    if (err) {
+  } else {
+    // Validation for req.body.ids
+    if (!_.isEmpty(req.body.ids) && req.body.ids instanceof Array && req.body.ids.length > 0) {
+      _ids = req.body.ids;
+    } else {return handleError(res, 'Bad request.!');}
+    // Validation for req.body.properties
+    if (!_.isEmpty(req.body.properties)) {
+      _values = req.body.properties;
+    }
+    dataPackage = {
+      user: user,
+      _ids: _ids,
+      _values: _values
+    };
+    update(dataPackage).then(function() {
+      // Return error_code = 0 when analyzers were update
+      res.status(200).json({ error_code: 0 });
+    }).catch(function(err) {
       return {
         error_code: 1,
         error_detail:  handleError(res, err)
       };
-    }
-    // Return error_code = 0 when analyzers were update 
-    res.status(200).json(
-      {
-        error_code: 0
-      }
-    );
-  });
+    });
+  }
 };
 
 /**
@@ -187,6 +196,17 @@ exports.findById = function (req, res) {
     res.status(200).json(_.omit(analyzer.toObject(), ['__v']));
   });
 };
+
+/**
+ * Finding analyzer by name.
+ *
+ * @param req
+ * @param res
+ */
+function findByName(name, res) {
+  // Finding analyzer by name
+  return AnalyzerModel.findOne({ name: name }).exec();
+}
 
 /**
  * Finding all analyzer.
@@ -223,7 +243,7 @@ exports.deleteById = function (req, res) {
     if (!analyzer) {
       return res.json(401);
     }
-    // Tracking log when system delete analyzer 
+    // Tracking log when system delete analyzer
     var objHistory = {};
     objHistory.analyzer = analyzer._id;
     objHistory.user = req.user.email;
@@ -236,3 +256,80 @@ exports.deleteById = function (req, res) {
     res.status(200).json(_.omit(analyzer.toObject(), ['__v']));
   });
 };
+function logAnalyzerTestMap(req) {
+  // Tracking log for updating analyzerTestMap.
+  AnalyzerModel.find({ _id: { $in: req._ids } })
+  .exec(function (err, analyzer) {
+    // Handling error
+    if (err) {
+      return err;
+    }
+    _.forEach(analyzer, function (value) {
+      var objHistory = {};
+      objHistory.analyzer = value._id;
+      objHistory.user = req.user.email;
+      objHistory.action = 'Update analyzer';
+      objHistory.timestamp = new Date();
+      objHistory.data = JSON.stringify(value);
+      if (value.actived !== req._values.actived) {
+        objHistory.brief = 'Updated analyzer: ' + value.name + '\n Changed status from ' + value.actived + ' to ' + req._values.actived;
+        trackAnalyzer(objHistory);
+      }
+    });
+  });
+}
+function update(req) {
+  // Tracking log for updating analyzerTestMap.
+  logAnalyzerTestMap(req);
+  // Updaing list of analyzers (_ids) with _values
+  return AnalyzerModel.update({ _id: { $in: req._ids } }, req._values, { multi: true }).exec();
+}
+/**
+ * Update Analyzers function
+ */
+function updateAnalyzers () {
+  let analyzersDisconnect =  _.differenceBy(AnalyzersConfig.analyzer, analyzersConnecting, 'name');
+  analyzersDisconnect.forEach(function (analyzerDisconnect) {
+    findByName(analyzerDisconnect.name).then(function (analyzer) {
+      let dataPackage = {
+        user: '',
+        _ids: analyzer._id,
+        _values: { actived: false }
+      };
+      return update(dataPackage);
+    }).then(function () {
+      var res = { error_code: 0, updatedAnalyzer: analyzerDisconnect.name };
+      //console.log(res);
+    }).catch(function(error) {
+      var err = { error_code: 1, error_detail:  error};
+      console.log(err);
+    });
+  });
+  if (analyzersConnecting.length > 0) {
+    analyzersConnecting.forEach(function (analyzerConnecting) {
+      findByName(analyzerConnecting.name).then(function (analyzer) {
+        if (analyzer.actived === false) {
+          let dataPackage = {
+            user: '',
+            _ids: analyzer._id,
+            _values: { actived: true }
+          };
+          return update(dataPackage);
+        }
+      }).then(function () {
+        var res = { error_code: 0, updatedAnalyzer: analyzerConnecting.name };
+        //console.log(res);
+      }).catch(function(error) {
+        var err = { error_code: 1, error_detail:  error };
+        console.log(err);
+      });
+    });
+  }
+  analyzersConnecting = [];
+}
+// Set status for analyzers
+cron.schedule(timeToUpdateAnalyzers, function(){
+  updateAnalyzers();
+});
+
+

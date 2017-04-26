@@ -9,11 +9,4 @@ angular.module('openAim')
         controller: 'TestMapCtrl',
         controllerAs: 'vm'
       });
-  })
-	.factory('testMapRes', ['$resource', 'Constant', function($resource, Constant) {
-    return $resource(Constant.serviceURL.TEST_MAPS, {},
-    {
-     'load': { method:'GET' },
-     'update': { method: 'PUT' }
-    });
-	}]);
+  });

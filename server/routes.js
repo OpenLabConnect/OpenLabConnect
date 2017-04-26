@@ -20,8 +20,9 @@ module.exports = function (app) {
   app.use('/api/file-analyzers', require('./api/file-analyzer'));
   app.use('/api/histories', require('./api/history'));
   app.use('/api/import-analyzers/file', require('./api/import-analyzer/file'));
+  app.use('/api/import-analyzers/string', require('./api/import-analyzer/string'));
   app.use('/api/test-types', require('./api/test-type'));
-
+  app.use('/api/settings', require('./api/setting'));
 
   app.route('/:url(api|app|bower_components|assets)/*')
     .get(function (req, res) {

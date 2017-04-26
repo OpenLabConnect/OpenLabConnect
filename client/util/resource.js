@@ -22,11 +22,15 @@ angular.module('openAim')
       'MAIN_MENU': 'Main Menu',
       'SEARCH_FOR': 'Search for...',
       'ERROR': 'Error',
+      'INVALID': 'Invalid',
       'INFO': 'Information',
       'CHOOSEFILE': 'Choose file',
       'UPLOADFILE': 'Upload file',
       'GETLATESTTEST': 'Get latest test',
       'DETAIL': 'Detail',
+      'ON': 'ON',
+      'OFF': 'OFF',
+      'CONTINUE': 'Continue',
       // Screens title
       'TITLE_STATUS_COM_PORTS': 'Status of COM ports of all analyzers',
       'TITLE_TEST_RESULTS': 'Test Results from Analyzers',
@@ -107,6 +111,7 @@ angular.module('openAim')
       'MSG_DUPLICATE': 'Data saved unsuccesfully! Test Map is duplicate.',
       'HISTORY_DATE_SEARCH_ERR_MISSING ': 'From-Date and To-Date is empty. Please fill all and check again!',
       'EMPTY_DATA': 'No data.',
+      'ECONNREFUSED': 'Can not connect to OpenELIS',
       // Test mapping
       'mapping.ADD_ROW': 'Add Row',
       'mapping.ANALYZER': 'Analyzer',
@@ -146,6 +151,9 @@ angular.module('openAim')
       'testNotExist': 'Test is not exists on database.',
       'analyzerNotExist': 'Analyzer is not exists on database.',
       'templateAndFileIsNotMap': 'Template and file is not map. Please choose again.',
+      'duplicateTestResult': 'Test result is already an existing result. Please delete it before adding a new one.',
+      'disconnectOpenLabConnectToAnalyzer': 'Can not connect to analyzer',
+      
       // Login
       'username': 'Username',
       'password': 'Password',
@@ -157,15 +165,32 @@ angular.module('openAim')
       'OPENELIS_ERROR': 'OpenELIS is not available.',
       // Test Result Error
       'EDIT_ACCESSIONUMBER': 'Accession Number must be {{accessionNumberLength}} characters.',
+      'DUPLICATE_ACCESSIONUMBER': 'Accession Number is duplicated',
+      'EXISTED_ACCESSIONUMBER': 'Accession Number has already existed',
       'CAN_NOT_CONNECT_TO_MEDIATOR': 'Can not transfer analyzer results. Can not connect to Mediator',
       'CAN_NOT_CONNECT_TO_OPENELIS': 'Can not transfer analyzer results. Can not connect to OpenELIS',
+      'ANALYZER_RESULT_EMPTY': 'Analyzer resuts is empty.',
+      'LESS10_ACCESSIONUMBER': 'Can not transfer analyzer results which accession number less than 10 characters.',
       // Test result info
-      'INFO_TRANSFER': 'Tranfer analyzer result into OpenELIS:',
+      'INFO_TRANSFER': 'Tranfer analyzer result into Mediator:',
       'INFO_TOTAL': 'Total: {{total}}',
       'INFO_SUCCESS': 'SuccessfulL: {{success}}',
       'INFO_FAIL': 'Failed: {{fail}}',
-      'ANALYZER_RESULTS_INVALID': 'The quantity of analyzer results were more than expectation. Please check again.'
-
+      'ANALYZER_RESULTS_INVALID': 'The quantity of analyzer results were more than expectation. Please check again.',
+      // Config auto insert result into lis
+      'AUTO_INSERT_INTOLIS': 'Auto insert analyzer result into OpenELIS system',
+      'AUTO_INSERT_ON_TO_OFF': 'Analyzer results will not be automatically inserted into OpenELIS. Because someone TURN OFF the auto insert config.',
+      'AUTO_INSERT_OFF_TO_ON': 'Analyzer results will be automatically inserted into OpenELIS. Because someone TURN ON the auto insert config.',
+      'AUTO_INSERT_CHANGE_TITLE': 'The auto insert config is changed.',
+      'AUTO_INSERT_CHANGE_CONTINUE': 'Do you want to continue to upload file?',
+      // Modal Pool
+      'ADD_ACCESSION_NUMBER': 'Add accession numbers',
+      'TEST_NAME': 'Test name',
+      'TEST_RESULT': 'Test result',
+      'BEGIN_DATE': 'Begin date',
+      'ACCESSIONUMBER_INPUT': 'Enter accession number',
+      // Save Test Result Pool
+      'CHECK_ACCESSIONUMBER': 'Please check accession numbers again: '
     });
 
     $translateProvider.translations('vn', {
@@ -188,10 +213,14 @@ angular.module('openAim')
       'MAIN_MENU': 'Danh mục chính',
       'SEARCH_FOR': 'Tìm kiếm...',
       'ERROR': 'Lỗi',
+      'INVALID': 'Không hợp lệ',
       'CHOOSEFILE': 'Chọn tập tin',
       'UPLOADFILE': 'Tải lên tập tin',
       'GETLATESTTEST': 'Lấy xét nghiệm mới nhất',
       'DETAIL': 'Chi tiết',
+      'ON': 'ĐÃ BẬT',
+      'OFF': 'ĐÃ TẮT',
+      'CONTINUE': 'Tiếp tục',
       // Screens title
       'TITLE_STATUS_COM_PORTS': 'Trạng thái kết nối của các máy phân tích',
       'TITLE_TEST_RESULTS': 'Kết quả xét nghiệm từ các máy phân tích',
@@ -273,6 +302,7 @@ angular.module('openAim')
       'MSG_DUPLICATE': 'Lưu không thành công! Chỉ dẫn đã bị trùng.',
       'HISTORY_DATE_SEARCH_ERR_MISSING': 'Ngày bắt đầu và ngày kết thúc rỗng.Vui lòng nhập và thực hiện lại.',
       'EMPTY_DATA': 'Không có dữ liệu.',
+      'ECONNREFUSED': 'Không thể kết nối đến OpenELIS',
 
       // Test mapping
       'mapping.ADD_ROW': 'Thêm',
@@ -313,6 +343,9 @@ angular.module('openAim')
       'testNotExist': 'Xét nghiệm không tồn tại trong hệ thống.',
       'analyzerNotExist': 'Máy xét nghiệm không tồn tại trong hệ thống.',
       'templateAndFileIsNotMap': 'Mẫu tập tin và tập tin không trùng khớp. Vui lòng chọn lại.',
+      'duplicateTestResult': 'Kết quả xét nghiệm đã bị trùng. Vui lòng xóa kết quả đã tồn tại trước khi thay thế chúng!',
+      'disconnectOpenLabConnectToAnalyzer': 'Không thể kết nối với máy xét nghiệm',
+      
       // Login
       'username': 'Tên đăng nhập',
       'password': 'Mật khẩu',
@@ -324,14 +357,32 @@ angular.module('openAim')
       'OPENELIS_ERROR': 'Không thể kết nối tới hệ thống OpenELIS.',
       // Test Result Error
       'EDIT_ACCESSIONUMBER': 'Số hiệu mẫu phải đủ {{accessionNumberLength}} ký tự.',
+      'DUPLICATE_ACCESSIONUMBER': 'Số hiệu mẫu đã bị trùng',
+      'EXISTED_ACCESSIONUMBER': 'Số hiệu mẫu đã tồn tại',
       'CAN_NOT_CONNECT_TO_MEDIATOR': 'Không thể chuyển kết quả xét nghiệm. Đã có lỗi xảy ra khi kết nối tới hệ thống Mediator',
       'CAN_NOT_CONNECT_TO_OPENELIS': 'Không thể chuyển kết quả xét nghiệm. Đã có lỗi xảy ra khi kết nối tới hệ thống OpenELIS',
+      'ANALYZER_RESULT_EMPTY': 'Không có kết quả xét nghiệm nào được chọn.',
+      'LESS10_ACCESSIONUMBER': 'Không thể chuyển những kết quả có số hiệu mẫu nhỏ hơn 10 ký tự.',
       // Test Result Info
-      'INFO_TRANSFER': 'Thông tin chuyển kết quả đến OpenELIS:',
+      'INFO_TRANSFER': 'Thông tin chuyển kết quả đến Mediator:',
       'INFO_TOTAL': 'Tổng số kết quả xét nghiệm: {{total}}',
       'INFO_SUCCESS': 'Thành công: {{success}}',
       'INFO_FAIL': 'Thất bại: {{fail}}',
-      'ANALYZER_RESULTS_INVALID': 'Số lượng kết quả xét nghiệm chuyển đi nhiều hơn quy định. Vui lòng kiểm tra lại.'
+      'ANALYZER_RESULTS_INVALID': 'Số lượng kết quả xét nghiệm chuyển đi nhiều hơn quy định. Vui lòng kiểm tra lại.',
+      // Config auto insert result into lis
+      'AUTO_INSERT_INTOLIS': 'Chế độ tự động ghi kết quả xét nghiệm vào hệ thống OpenELIS',
+      'AUTO_INSERT_ON_TO_OFF': 'Kết quả xét nghiệm sẽ không được tự động ghi vào hệ thống OpenELIS. Vì đã có người tắt thiết lập này.',
+      'AUTO_INSERT_OFF_TO_ON': 'Kết quả xét nghiệm sẽ được tự động ghi vào hệ thống OpenELIS. Vì đã có người bật thiết lập này.',
+      'AUTO_INSERT_CHANGE_TITLE': 'Chế độ tự động ghi kết quả đã bị thay đổi.',
+      'AUTO_INSERT_CHANGE_CONTINUE': 'Bạn có muốn tiếp tục tải lên tập tin?',
+      // Modal Pool
+      'ADD_ACCESSION_NUMBER': 'Cập nhật số hiệu mẫu: ',
+      'TEST_NAME': 'Tên xét nghiệm: ',
+      'TEST_RESULT': 'Kết quả xét nghiệm: ',
+      'BEGIN_DATE': 'Ngày thực hiện: ',
+      'ACCESSIONUMBER_INPUT': 'Nhập số hiệu mẫu',
+      // Save Test Result Pool
+      'CHECK_ACCESSIONUMBER': 'Vui lòng kiểm tra lại các số hiệu mẫu: '
 
     });
   $translateProvider.useSanitizeValueStrategy(null);

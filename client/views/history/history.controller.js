@@ -1,20 +1,20 @@
 'use strict';
 
 angular.module('openAim')
-  .controller('HistoryCtrl', function ($uibModal,analyzerRes, historyRes, Constant) {
+  .controller('HistoryCtrl', function (ModalService, Api, Constant, $location) {
 
     var vm = this;
 
     angular.extend(vm, {
 
-    	// init data
+      // init data
       name: 'HistoryCtrl',
       analyzers: [],
       histories : [],
       search: {
-      	analyzer: {},
-      	fromDate: null,
-      	toDate: null
+        analyzer: {},
+        fromDate: null,
+        toDate: null
       },
       toDateTimestamp: '',
       fromDateTimestamp: '',
@@ -58,14 +58,14 @@ angular.module('openAim')
         get all analyzers and set selected property as false
       */
       getAnalyzers: function(){
-      	return analyzerRes.query().$promise.then(function(data) {
-	        console.log(Constant.msg.analyzer.MSG_LOAD_DATA_SUCCESS + new Date());
-	        vm.analyzers = data;
+        return Api.Analyzer.query().$promise.then(function(data) {
+          console.log(Constant.msg.analyzer.MSG_LOAD_DATA_SUCCESS + new Date());
+          vm.analyzers = data;
           return data;
-      	}, function() {
-	        console.log(Constant.msg.analyzer.MSG_LOAD_DATA_SUCCESS + new Date());
+        }, function() {
+          console.log(Constant.msg.analyzer.MSG_LOAD_DATA_SUCCESS + new Date());
           return false;
-	   		});
+        });
       },
 
       /**
@@ -73,60 +73,42 @@ angular.module('openAim')
       */
       getHistories: function(){
         // send request with the filter conditions and get return data
-      	return historyRes.load({
-      		page: vm.currentPage,
-      		analyzerId: (vm.search.analyzer) ? vm.search.analyzer._id : null ,
-      		fromDate: (vm.fromDateTimestamp === '') ? null : vm.fromDateTimestamp,
-      		toDate: (vm.toDateTimestamp === '') ? null : vm.toDateTimestamp,
-      		limit: vm.recordPerPage
-      	}).$promise.then(function(data) {
-		        console.log(Constant.msg.histories.MSG_LOAD_DATA_SUCCESS + new Date());
-		        vm.histories = data.historyResult;
-		        vm.totalItems = data.totalHistoryResult;
+        return Api.History.get({
+          page: vm.currentPage,
+          analyzerId: (vm.search.analyzer) ? vm.search.analyzer._id : null ,
+          fromDate: (vm.fromDateTimestamp === '') ? null : vm.fromDateTimestamp,
+          toDate: (vm.toDateTimestamp === '') ? null : vm.toDateTimestamp,
+          limit: vm.recordPerPage
+        }).$promise.then(function(data) {
+            console.log(Constant.msg.histories.MSG_LOAD_DATA_SUCCESS + new Date());
+            vm.histories = data.historyResult;
+            vm.totalItems = data.totalHistoryResult;
             vm.noData = (data.totalHistoryResult === 0);
             return data;
-      	}, function() {
-	        console.log(Constant.msg.histories.MSG_LOAD_DATA_UNSUCCESS + new Date());
+        }, function() {
+          console.log(Constant.msg.histories.MSG_LOAD_DATA_UNSUCCESS + new Date());
           return false;
-	   		});
+        });
       },
 
       /**
         search test results
       */
       onSearch: function() {
-      	vm.setPage(1);
+
+        // Clear ?latest flag
+        $location.search({});
+
+        vm.setPage(1);
         vm.fromDateTimestamp = vm.search.fromDate ? vm.search.fromDate.getTime() : '';
         vm.toDateTimestamp = vm.search.toDate ? vm.search.toDate.getTime() : '';
         if(vm.fromDateTimestamp === '' && vm.toDateTimestamp === '') {
-          var alertErrorModal = $uibModal.open({
-            templateUrl: 'alert-error-modal',
-            controller: 'AlertErrorModalCtrl',
-            size: 'sm',
-            animation: true,
-            resolve: {
-              errorMessage: function() {
-                var msg = Constant.msg.histories.MSG_ERROR_MISSING_DATE;
-                return msg;
-              }
-            }
-          });
+          ModalService.error(Constant.msg.histories.MSG_ERROR_MISSING_DATE);
           return false;
         }
 
-        if (vm.fromDateTimestamp != '' && vm.toDateTimestamp != '' && (vm.fromDateTimestamp > vm.toDateTimestamp)) {
-          var alertErrorModal = $uibModal.open({
-            templateUrl: 'alert-error-modal',
-            controller: 'AlertErrorModalCtrl',
-            size: 'sm',
-            animation: true,
-            resolve: {
-              errorMessage: function() {
-                var msg = Constant.msg.histories.MSG_ERROR_DATE;
-                return msg;
-              }
-            }
-          });
+        if (vm.fromDateTimestamp !== '' && vm.toDateTimestamp !== '' && (vm.fromDateTimestamp > vm.toDateTimestamp)) {
+          ModalService.error(Constant.msg.histories.MSG_ERROR_DATE);
           vm.search.toDate = '';
           vm.search.fromDate = '';
           return false;
@@ -139,15 +121,15 @@ angular.module('openAim')
         @param pageNo
       */
       setPage: function (pageNo) {
-		    return vm.currentPage = pageNo;
-		  },
+        return vm.currentPage = pageNo;
+      },
 
-		  /**
+      /**
         change page
       */
-		  pageChanged: function() {
-		    return vm.getHistories();
-		  },
+      pageChanged: function() {
+        return vm.getHistories();
+      },
 
       /**
         break word the long text
@@ -171,10 +153,9 @@ angular.module('openAim')
 
     // on page loaded
     vm.getAnalyzers();
-  })
-  .controller('AlertErrorModalCtrl', function ($scope, $uibModalInstance, errorMessage) {
-    $scope.errorMessage = errorMessage;
-    $scope.close = function () {
-      $uibModalInstance.dismiss('cancel');
-    };
-});
+    // Check the detail param. If the equal "true" get histories
+    var latest = $location.search().latest;
+    if (latest) {
+      vm.getHistories();
+    }
+  });

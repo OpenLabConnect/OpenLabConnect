@@ -10,7 +10,8 @@ angular.module('openAim')
       HISTORY: 'api/histories/:id',
       TEST: 'api/tests/:id',
       TEST_MAPS: 'api/test-maps/:id',
-      UPLOAD: 'api/import-analyzers/file'
+      UPLOAD: 'api/import-analyzers/file',
+      SETTING: 'api/settings/:key'
     },
 
     // analyzer status
@@ -34,40 +35,66 @@ angular.module('openAim')
     // common
     ALL: 'ALL',
 
-    // Upload file templates
-    UPLOAD_TEMPLATE : [
-      'IgG Dai',
-      'IgG DEN',
-      'IgG HTN',
-      'IgM DEN',
-      'IgM JE',
-      'IgM HTN',
-      'NS1 DEN',
-      'Realtime.PCR-Dengue-(Định Tính)',
-      'Realtime.PCR-Zika-(Định Tính)',
-      'Realtime.PCR-Zika-(Định Lượng)',],
-    // Upload file error
-    UPLOAD_ERROR : {
-      '-1': 'templateWasNotChoose',
-      '0': 'templatesWasNotFound',
-      '1': 'testMapIsNotFull',
-      '2': 'testCodeInvalid',
-      '3': 'analyzerIsNotActive',
-      '4': 'fileMissingData',
-      '5': 'testCodeDoesNotExists',
-      '6': 'sheetNameIncorrect',
-      '7': 'templateUnderfined',
-      '8': 'testNotExist',
-      '9': 'analyzerNotExist',
-      '10': 'templateAndFileIsNotMap'
+    // Upload config
+    UPLOAD: {
+      TEMPLATE: [
+        'ABI7500.Trioplex',
+        'GeneXpert.389.MTB',
+        'IgG Dai',
+        'IgG DEN',
+        'IgG HTN',
+        'IgM DEN',
+        'IgM JE',
+        'IgM HTN',
+        'NS1 DEN',
+        'Realtime.PCR-Dengue-(Định Tính)',
+        'Realtime.PCR-Zika-(Định Tính)',
+        'Realtime.PCR-Zika-(Định Lượng)',
+        'Realtime.PCR-Pool-(Định Tính)',
+        'Realtime.PCR-Pool-(Định Lượng)'
+      ],
+      ERROR: {
+        '-1': 'templateWasNotChoose',
+        '0': 'templatesWasNotFound',
+        '1': 'testMapIsNotFull',
+        '2': 'testCodeInvalid',
+        '3': 'analyzerIsNotActive',
+        '4': 'fileMissingData',
+        '5': 'testCodeDoesNotExists',
+        '6': 'sheetNameIncorrect',
+        '7': 'templateUnderfined',
+        '8': 'testNotExist',
+        '9': 'analyzerNotExist',
+        '10': 'templateAndFileIsNotMap',
+        '11': 'duplicateTestResult'
+      },
+      FORMDATA: {
+        file: 'file',
+        txtfile: 'test',
+        template: 'template',
+        beginDate: 'beginDate'
+      }
     },
+    // SETTING
+    setting: {
+      AUTO_INSERT: 'auto-insert',
+      SUPPORT_TEMPLATES: 'support-templates',
+      AUTO_INSERT_INTOLIS: 'AUTO_INSERT_INTOLIS',
+      ON: 'ON',
+      OFF: 'OFF',
+    },
+
     // test result status
     testResultStatus: {
       NEW: 'NEW',
       SAVED: 'TRANSFERRED'
     },
-	testResultError: {
-      EDIT_ACCESSIONUMBER: 'EDIT_ACCESSIONUMBER'
+
+    testResultError: {
+      EDIT_ACCESSIONUMBER: 'EDIT_ACCESSIONUMBER',
+      ANALYZER_RESULT_EMPTY: 'ANALYZER_RESULT_EMPTY',
+      LESS10_ACCESSIONUMBER: 'LESS10_ACCESSIONUMBER',
+      DUPLICATE_ACCESSIONUMBER: 'DUPLICATE_ACCESSIONUMBER'
     },
     // test result
     testResult: {
@@ -104,6 +131,9 @@ angular.module('openAim')
         MSG_CLOSE_ALL_UNSUCCESS: 'Close all analyzers unsuccessfully at ',
         MSG_UPDATE_SUCCESS: 'Update analyzers successfully at ',
         MSG_UPDATE_UNSUCCESS: 'Update analyzers unsuccessfully at '
+      },
+      analyzerServer: {
+        disconnectOpenLabConnectToAnalyzer: 'disconnectOpenLabConnectToAnalyzer'
       },
       // test result screen
       analyzerResult: {
@@ -168,5 +198,11 @@ angular.module('openAim')
     // Configuration for test-result view
     testResultView: {
       accessionNumberLength: 10
-    }
+    },
+    // Auto Connect OpenELIS
+    ECONNREFUSED: 'ECONNREFUSED',
+    // Pool specimen
+    POOL: 'Pool',
+    TXTFILE: ['ABI7500.Trioplex'],
+    CSVFILE: ['GeneXpert.389.MTB']
   });

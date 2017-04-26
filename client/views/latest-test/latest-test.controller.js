@@ -1,7 +1,7 @@
 'use strict';
 
 angular.module('openAim')
-  .controller('LatestTestCtrl', function ($uibModal, testRes, Constant) {
+  .controller('LatestTestCtrl', function (Api, ModalService, Constant) {
 
     var vm = this;
 
@@ -23,50 +23,22 @@ angular.module('openAim')
       */
       getLatestTest: function(latest){
         // send request with the filter conditions and get return data
-      	return testRes.load({
+      	return Api.Test.get({
       		latest: latest,
       		page: vm.currentPage,
       		limit: vm.recordPerPage
-      	}).$promise.then(function(data) {
+      	}).$promise.then( function(data) {
 	        console.log(Constant.msg.test.MSG_LOAD_DATA_SUCCESS + new Date());
 	        vm.tests = data.testResult;
 	        vm.totalItems = data.totalTestResult;
           if (latest === true) {
-            var alertModal = $uibModal.open({
-              templateUrl: 'alert-modal-get-latest-test',
-              controller: 'AlertModalGetLatestCtrl',
-              size: 'sm',
-              animation: true,
-              resolve: {
-                popupMessage: function() {
-                  var msg = Constant.msg.test.MSG_GET_OK;
-                  return msg;
-                },
-                updateStatus: data.updateStatus
-              }
-            });
-            // open message modal
-            return alertModal.result.then(function() {}); 
+            ModalService.successLatestTest(Constant.msg.test.MSG_GET_OK, data.updateStatus);
           }
           return data;
       	}, function() {
-	        console.log(Constant.msg.test.MSG_LOAD_DATA_SUCCESS + new Date());
+	        console.log(Constant.msg.test.MSG_LOAD_DATA_UNSUCCESS + new Date());
           if (latest === true) {
-            var alertModal = $uibModal.open({
-              templateUrl: 'alert-modal-get-latest-test',
-              controller: 'AlertModalGetLatestCtrl',
-              size: 'sm',
-              animation: true,
-              resolve: {
-                popupMessage: function() {
-                  var msg = Constant.msg.test.MSG_GET_NOT_OK;
-                  return msg;
-                },
-                updateStatus: null
-              }
-            });
-            // open message modal
-            return alertModal.result.then(function() {}); 
+            ModalService.error(Constant.msg.test.MSG_GET_NOT_OK);
           }
           return false;
 	   		});
@@ -99,26 +71,5 @@ angular.module('openAim')
 
     // on page loaded
 		vm.getLatestTest(false);
-  })
-  .controller('AlertModalGetLatestCtrl', function ($scope, Constant, $uibModalInstance, popupMessage, updateStatus) {
-    $scope.popupMessage = popupMessage;
-    if (updateStatus) {
-      // Showing the number of creared test
-      if (updateStatus.numberCreated > 0) {
-        $scope.translationDataCreated = {
-          created: updateStatus.numberCreated
-        };
-        $scope.numberCreated = Constant.msg.test.MSG_CREATED_OK;
-      }
-      // Showing the number of updated test
-      if (updateStatus.numberUpdated > 0) {
-        $scope.translationDataUpdated = {
-          updated: updateStatus.numberUpdated
-        };
-        $scope.numberUpdated = Constant.msg.test.MSG_UPDATED_OK;
-      }
-    }
-    $scope.close = function () {
-      $uibModalInstance.close();
-    };
   });
+

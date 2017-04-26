@@ -10,12 +10,14 @@ angular.module('openAim', [
   'ui.bootstrap',
   'xeditable',
   'ui.select',
-  'btford.socket-io'
+  'btford.socket-io',
+  'angular-loading-bar'
 ])
-  .config(function ($routeProvider, $locationProvider, $httpProvider, $urlRouterProvider) {
+  .config(function ($routeProvider, $locationProvider, $httpProvider, $urlRouterProvider, cfpLoadingBarProvider) {
     $urlRouterProvider.when('/', '/analyzer');
     $locationProvider.html5Mode(true);
     $httpProvider.interceptors.push('authInterceptor');
+    cfpLoadingBarProvider.includeSpinner = false;
   })
   .factory('authInterceptor',
   function ($rootScope, $q, $cookieStore, $location) {

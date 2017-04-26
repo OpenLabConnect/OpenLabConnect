@@ -1,7 +1,7 @@
 'use strict';
 
 const DateFormat = require('dateformat');
-const Format = 'dd/mm/yyyy';
+const UTCFormat = 'dd/mm/yyyy';
 const ISOFormat = 'yyyy-mm-dd';
 
 // Convert datetime object to timestamp
@@ -11,10 +11,14 @@ function convertToTimestamp (objDate) {
     { timestamp = objDate.getTime(); }
   else if (typeof(objDate) == 'string') {
     // Check date is invalid Date
-    var date = new Date(objDate);
+    var dateElements = objDate.split('/');
+    var date = new Date(dateElements[1] + '/' + dateElements[0] + '/' + dateElements[2]);
     timestamp = isNaN(date.getDate()) ? parseInt(objDate) : date.getTime();
   } else if (isNaN(objDate))
     { timestamp = null; }
+    else {
+      timestamp = objDate;
+    }
   return timestamp;
 }
 // Convert date time to UTC
@@ -24,15 +28,24 @@ exports.toUTC = function (objDate) {
   let utc = new Date(timestamp).toUTCString();
   // Remove time GMT
   let date = utc.split(' ').slice(0, 4).join(' ');
-  return DateFormat(date, Format);
+  return DateFormat(date, UTCFormat);
 };
 
 exports.toGMT = function (objDate) {
   let timestamp = convertToTimestamp(objDate);
-  return DateFormat(parseInt(timestamp), Format);
+  return DateFormat(parseInt(timestamp), UTCFormat);
 };
 // Format: yyyy-mm-dd
 exports.toISO = function (objDate) {
   let timestamp = convertToTimestamp(objDate);
   return DateFormat(parseInt(timestamp), ISOFormat);
+};
+exports.toUTCtimeStamp = function(dateTime) {
+  // Get timeStamp from dateTime
+  dateTime = dateTime instanceof Date ? dateTime.getTime() : dateTime;
+  // Get the time difference between UTC time and local time, in minutes
+  // Convert timezoneOffset from minutes to milisecond
+  var timezoneOffset = new Date().getTimezoneOffset() * 60 * 1000;
+  var modifyTime = dateTime - timezoneOffset; // subtract the time difference
+  return modifyTime;
 };
