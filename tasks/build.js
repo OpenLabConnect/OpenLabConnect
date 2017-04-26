@@ -93,9 +93,15 @@ gulp.task('scripts', function () {
       module: 'openAim'
     }));
 
+  var services = gulp.src('client/services/**/*.html')
+    .pipe(angularTemplatecache({
+      root: 'services',
+      module: 'openAim'
+    }));
+
   var app = gulp.src('dist/client/app.js');
 
-  return sq({ objectMode: true }, app, views, tpls)
+  return sq({ objectMode: true }, app, views, tpls, services)
     .pipe(concat('app.js'))
     .pipe(ngAnnotate())
     .pipe(uglify())

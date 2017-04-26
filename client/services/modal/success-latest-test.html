@@ -1,0 +1,11 @@
+<div class="modal-header">
+  <h3 class="modal-title text-danger">{{ 'GETLATESTTEST' | translate }}</h3>
+</div>
+<div class="modal-body">
+  <p>{{ popupMessage | translate }}</p>
+  <p>{{ numberCreated | translate:translationDataCreated }}</p>
+  <p>{{ numberUpdated | translate:translationDataUpdated }}</p>
+</div>
+<div class="modal-footer">
+  <button class="btn btn-default" type="button" ng-click="close()">{{ 'OK' | translate }}</button>
+</div>

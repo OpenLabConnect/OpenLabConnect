@@ -105,23 +105,50 @@ function dateToUTC(timestamp) {
 function prepareData (transferResult) {
   var transferData = {},
     mainResult = transferResult.mainResult.result.result,
+	  typeMainResult = transferResult.mainResult.result.type,
     subResult = transferResult.subResult ? transferResult.subResult.result : '',
     beginDate = transferResult.mainResult.beginDate,
     // 2097, 2098, 2292 is a config from LIS
-    convertResult = { '-1': '2097', '1': '2098', '0': '2292'};
+    convertResult = { '-1': '2097', '1': '2098', '0': '2292'},
+    // 2435, 2436, 2437,2438 is a config from LIS
+    convertMTBResult = {
+      'ERROR': 2438,
+      'INVALID': 2438,
+      'MTB NOT DETECTED': 2435,
+      'MTB DETECTED LOW; RIF RESISTANCE DETECTED': 2437,
+      'MTB DETECTED MEDIUM; RIF RESISTANCE DETECTED': 2437,
+      'MTB DETECTED HIGH; RIF RESISTANCE DETECTED': 2437,
+      'MTB DETECTED LOW; RIF RESISTANCE NOT DETECTED': 2436,
+      'MTB DETECTED MEDIUM; RIF RESISTANCE NOT DETECTED': 2436,
+      'MTB DETECTED HIGH; RIF RESISTANCE NOT DETECTED': 2436,
+    },
+    MTBAnalyzer = ['GeneXpert'],
+    convertInstrument = {'AU400': 50, 'Optilion': 51, 'Human Combilyzer': 9};
+  transferData.instrumentId = convertInstrument[transferResult.mainResult.analyzer.name];
   transferData.accessNumber = transferResult.mainResult.accessionNumber;
   transferData.testId = transferResult.mainResult.test.testId;
   transferData.beginDate = beginDate ? dateToUTC(beginDate) : '';
   if (!subResult) {
-    // transfer result does not have sub result
-    transferData.mainResult = convertResult[mainResult] ? convertResult[mainResult] : mainResult;
+    if (typeMainResult.name == 'result') {
+      // convertMTBResult apply on MTB analyzer
+      if (MTBAnalyzer.indexOf(transferResult.mainResult.analyzer.name) > -1) {
+        transferData.mainResult = convertMTBResult[mainResult.toUpperCase()] ? convertMTBResult[mainResult.toUpperCase()] : convertMTBResult['ERROR'];
+      } else {
+        transferData.mainResult = convertResult[mainResult] ? convertResult[mainResult] : mainResult;
+      }
+    } else {
+    	transferData.mainResult = mainResult;
+    }
   } else {
     // transfer result have sub result
     var convertTestResult = '';
     convertTestResult = convertResult[mainResult];
-    if (!convertTestResult) { convertTestResult = '2292'; }
-
-    transferData.mainResult = convertTestResult;
+    if (typeMainResult.name == 'result') {
+      if (!convertTestResult) { convertTestResult = '2292'; }
+      transferData.mainResult = convertTestResult;
+    } else {
+      transferData.mainResult = mainResult;
+    }
     transferData.subResult = subResult.result;
   }
   return transferData;
@@ -170,10 +197,7 @@ app.post('/api/test', function(req, res) {
     }
     // Return information to OpenAIM system
     res.send({
-      'exporting-data': response.body.message,
-      error: response.body.error,
-      transferResults: transferResults,
-      transferCount: _.size(transferResults)
+      'exporting-data': 'success'
     });
   }, function (err) {
     res.send({

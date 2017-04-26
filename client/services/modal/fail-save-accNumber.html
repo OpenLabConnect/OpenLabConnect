@@ -1,0 +1,22 @@
+<div class="modal-header">
+  <button type="button" class="close" data-dismiss="modal">&times;</button>
+  <h3 class="modal-title"> {{ 'ERROR' | translate }} </h3>
+  <h4 class="modal-title"> {{ 'EXISTED_ACCESSIONUMBER' | translate }} </h4>
+</div>
+
+<div class="modal-body add-accession-number-modal">
+  <form id="form" method="post">
+    <p align="center"> {{ 'CHECK_ACCESSIONUMBER' | translate }} </p>
+
+    <fieldset  data-ng-repeat="accNumber in accNumbers">
+      <div class="form-group">
+          <p class="text-danger" align="center"> {{ accNumber }} </p>
+      </div>
+    </fieldset>
+
+  </form>
+</div>
+
+<div class="modal-footer">
+  <button class="btn btn-default" type="button" ng-click="close()"> {{ 'OK' | translate }} </button>
+</div>

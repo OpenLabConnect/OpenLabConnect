@@ -1,7 +1,6 @@
 'use strict';
 
 var config = require('../../../config/environment');
-
 /**
  * Receiving and storing a documentation.
  *
@@ -14,13 +13,12 @@ exports.uploadFile = function (req, res) {
   if (req.body.beginDate > 0) { // Validation input date
     beginDate = req.body.beginDate;
   }
-  require('../../../parser/parser.js')(req.filename, req.extName, req.directory, req.body.template, beginDate)
-  .then(function () {
-    res.status(200).end('File was uploaded');
+  require('../../../file-parser/parser.js')(req.filename, req.extName, req.directory, req.body.template, beginDate)
+  .then(function (resolve) {
+    res.status(200).json({ message: 'File was uploaded', analyzerResults: resolve.analyzerResults });
   },
   function (rej) {
     res.setHeader('error', rej.code);
     res.status(500).end(rej.code);
-    console.log(rej.description);
   });
 };

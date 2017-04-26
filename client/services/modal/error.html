@@ -1,0 +1,9 @@
+<div class="modal-header">
+  <h3 class="modal-title text-danger">{{ 'ERROR' | translate }}</h3>
+</div>
+<div class="modal-body">
+  <p>{{ errorMessage | translate:translationData }}</p>
+</div>
+<div class="modal-footer">
+  <button class="btn btn-default" type="button" ng-click="close()">{{ 'OK' | translate }}</button>
+</div>

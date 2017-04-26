@@ -9,8 +9,8 @@ angular.module('openAim')
         controller: 'UploadCtrl',
         controllerAs: 'vm'
       });
-	})
-	.directive('fileModel', ['$parse', function ($parse) {
+  })
+  .directive('fileModel', ['$parse', function ($parse) {
     return {
        restrict: 'A',
        link: function(scope, element, attrs) {
@@ -23,29 +23,4 @@ angular.module('openAim')
           });
        }
     };
- 	}])
-	.service('fileUpload', ['Constant', '$http', '$cookieStore', function (Constant, $http) {
-		this.uploadFileToUrl = function(file, template, beginDate){
-			var fd = new FormData();
-			fd.append('excel', file);
-      fd.append('template', template);
-      fd.append('beginDate', beginDate);
-			return $http.post(Constant.serviceURL.UPLOAD, fd, {
-        transformRequest: angular.identity,
-        headers: {
-        	'Content-Type': undefined
-      	}
-     	});
-    };
-	}])
-  .service('DateTimeUtil', function () {
-    this.toUTC = function (dateTime) {
-      // Get timeStamp from dateTime
-      dateTime = dateTime instanceof Date ? dateTime.getTime() : dateTime;
-      // Get the time difference between UTC time and local time, in minutes
-      // Convert timezoneOffset from minutes to milisecond
-      var timezoneOffset = new Date().getTimezoneOffset() * 60 * 1000;
-      var modifyTime = dateTime - timezoneOffset; // subtract the time difference
-      return modifyTime;
-    };
-  });
+  }]);

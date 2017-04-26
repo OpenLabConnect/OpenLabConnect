@@ -9,11 +9,4 @@ angular.module('openAim')
         controller: 'LatestTestCtrl',
         controllerAs: 'vm'
       });
-  })
-
-	.factory('testRes', ['$resource', 'Constant', function($resource, Constant) {
-    return $resource(Constant.serviceURL.TEST, {},
-    {
-      'load': { method:'GET' }
-    });
-  }]);
+  });

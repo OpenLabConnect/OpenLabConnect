@@ -9,11 +9,4 @@ angular.module('openAim')
         controller: 'AnalyzerCtrl',
         controllerAs: 'vm'
       });
-  })
-
-  .factory('analyzerRes', ['$resource', 'Constant', function($resource, Constant) {
-    return $resource(Constant.serviceURL.ANALYZER, {},
-    {
-      'update': { method:'PUT' }
-    });
-  }]);
+  });
